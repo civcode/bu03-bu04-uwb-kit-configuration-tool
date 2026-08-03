@@ -2,6 +2,7 @@
 #include <cstring>
 #include <fcntl.h>
 #include <iostream>
+#include <poll.h>
 #include <stdexcept>
 #include <string>
 #include <termios.h>
@@ -86,6 +87,73 @@ public:
 
         throw std::runtime_error(
             "UART read failed: " + std::string(std::strerror(errno)));
+    }
+    
+    std::string readAll(int firstByteTimeoutMs = 1000,
+                    int interByteTimeoutMs = 50)
+    {
+        std::string result;
+        char buffer[256];
+
+        int timeoutMs = firstByteTimeoutMs;
+
+        while (true) {
+            pollfd descriptor{};
+            descriptor.fd = fd_;
+            descriptor.events = POLLIN;
+
+            int pollResult;
+
+            do {
+                pollResult = ::poll(&descriptor, 1, timeoutMs);
+            } while (pollResult < 0 && errno == EINTR);
+
+            if (pollResult < 0) {
+                throw std::runtime_error(
+                    "UART poll failed: " +
+                    std::string(std::strerror(errno)));
+            }
+
+            if (pollResult == 0) {
+                // No data arrived before the timeout.
+                break;
+            }
+
+            if (descriptor.revents & (POLLERR | POLLHUP | POLLNVAL)) {
+                throw std::runtime_error("UART poll reported an error");
+            }
+
+            if (descriptor.revents & POLLIN) {
+                ssize_t count;
+
+                do {
+                    count = ::read(fd_, buffer, sizeof(buffer));
+                } while (count < 0 && errno == EINTR);
+
+                if (count > 0) {
+                    result.append(buffer, static_cast<std::size_t>(count));
+
+                    // After receiving the first bytes, use the shorter
+                    // timeout to detect the end of the message.
+                    timeoutMs = interByteTimeoutMs;
+                    continue;
+                }
+
+                if (count == 0) {
+                    break;
+                }
+
+                if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                    continue;
+                }
+
+                throw std::runtime_error(
+                    "UART read failed: " +
+                    std::string(std::strerror(errno)));
+            }
+        }
+
+        return result;
     }
 
 private:

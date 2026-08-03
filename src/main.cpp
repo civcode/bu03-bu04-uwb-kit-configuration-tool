@@ -26,10 +26,11 @@ void test_command(Uart& uart, const std::string& command)
     std::cout << "Sending command: " << command << std::endl << std::flush;
     uart.writeAll(command + "\r\n");
 
-    const std::string received = uart.readSome();
+    // const std::string received = uart.readSome();
+    const std::string received = uart.readAll();
     if (!received.empty()) {
-        // std::cout << "Received " << received.size()
-        //           << " bytes: " << std::endl << received << std::flush;
+        std::cout << "Received " << received.size()
+                  << " bytes: " << std::endl << std::flush;
         std::cout << received << std::flush;
     } else {
         std::cout << "Read timeout\n";
