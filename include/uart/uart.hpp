@@ -1,0 +1,161 @@
+#include <cerrno>
+#include <cstring>
+#include <fcntl.h>
+#include <iostream>
+#include <stdexcept>
+#include <string>
+#include <termios.h>
+#include <unistd.h>
+
+class Uart {
+public:
+    Uart(const std::string& device, speed_t baudRate)
+        : fd_(-1)
+    {
+        fd_ = ::open(device.c_str(), O_RDWR | O_NOCTTY | O_SYNC);
+        if (fd_ < 0) {
+            throw std::runtime_error(
+                "Failed to open " + device + ": " + std::strerror(errno));
+        }
+
+        try {
+            configure(baudRate);
+        } catch (...) {
+            ::close(fd_);
+            fd_ = -1;
+            throw;
+        }
+    }
+
+    ~Uart()
+    {
+        if (fd_ >= 0) {
+            ::close(fd_);
+        }
+    }
+
+    Uart(const Uart&) = delete;
+    Uart& operator=(const Uart&) = delete;
+
+    void writeAll(const std::string& data)
+    {
+        std::size_t totalWritten = 0;
+
+        while (totalWritten < data.size()) {
+            const ssize_t written = ::write(
+                fd_,
+                data.data() + totalWritten,
+                data.size() - totalWritten);
+
+            if (written > 0) {
+                totalWritten += static_cast<std::size_t>(written);
+            } else if (written < 0 && errno == EINTR) {
+                continue;
+            } else {
+                throw std::runtime_error(
+                    "UART write failed: " + std::string(std::strerror(errno)));
+            }
+        }
+
+        // Wait until all bytes have physically left the transmitter.
+        if (::tcdrain(fd_) != 0) {
+            throw std::runtime_error(
+                "tcdrain failed: " + std::string(std::strerror(errno)));
+        }
+    }
+
+    std::string readSome(std::size_t maxBytes = 256)
+    {
+        std::string buffer(maxBytes, '\0');
+
+        const ssize_t count = ::read(fd_, buffer.data(), buffer.size());
+
+        if (count > 0) {
+            buffer.resize(static_cast<std::size_t>(count));
+            return buffer;
+        }
+
+        if (count == 0) {
+            // Timeout occurred.
+            return {};
+        }
+
+        if (errno == EINTR) {
+            return {};
+        }
+
+        throw std::runtime_error(
+            "UART read failed: " + std::string(std::strerror(errno)));
+    }
+
+private:
+    int fd_;
+
+    void configure(speed_t baudRate)
+    {
+        termios tty{};
+
+        if (::tcgetattr(fd_, &tty) != 0) {
+            throw std::runtime_error(
+                "tcgetattr failed: " + std::string(std::strerror(errno)));
+        }
+
+        // Set input and output baud rates.
+        if (::cfsetispeed(&tty, baudRate) != 0 ||
+            ::cfsetospeed(&tty, baudRate) != 0) {
+            throw std::runtime_error(
+                "Failed to set baud rate: " +
+                std::string(std::strerror(errno)));
+        }
+
+        // 8 data bits.
+        tty.c_cflag &= ~CSIZE;
+        tty.c_cflag |= CS8;
+
+        // No parity.
+        tty.c_cflag &= ~PARENB;
+
+        // One stop bit.
+        tty.c_cflag &= ~CSTOPB;
+
+        // Disable hardware flow control.
+        tty.c_cflag &= ~CRTSCTS;
+
+        // Enable receiver and ignore modem-control lines.
+        tty.c_cflag |= CREAD | CLOCAL;
+
+        // Raw input mode.
+        tty.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+
+        // Disable software flow control and special input processing.
+        tty.c_iflag &= ~(IXON | IXOFF | IXANY);
+        tty.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR |
+                         ICRNL);
+
+        // Raw output mode.
+        tty.c_oflag &= ~(OPOST | ONLCR);
+
+        /*
+         * Read behavior:
+         *
+         * VMIN  = 0
+         * VTIME = 10
+         *
+         * read() waits for up to 1 second.
+         * VTIME is measured in tenths of a second.
+         */
+        tty.c_cc[VMIN] = 0;
+        tty.c_cc[VTIME] = 10; // time in 100 ms
+
+        if (::tcsetattr(fd_, TCSANOW, &tty) != 0) {
+            throw std::runtime_error(
+                "tcsetattr failed: " + std::string(std::strerror(errno)));
+        }
+
+        // Discard stale data already present in the UART buffers.
+        if (::tcflush(fd_, TCIOFLUSH) != 0) {
+            throw std::runtime_error(
+                "tcflush failed: " + std::string(std::strerror(errno)));
+        }
+    }
+};
