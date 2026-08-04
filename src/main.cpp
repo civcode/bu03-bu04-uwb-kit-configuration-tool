@@ -10,6 +10,7 @@
 #include <thread>
 
 #include "uart/uart.hpp"
+#include "uart/bu04_handler.hpp"
 
 namespace 
 {
@@ -103,19 +104,23 @@ int main(int argc, char* argv[])
         std::cout << "Opened " << device << " at 115200 baud\n";
 
         std::cout << "Sending test commands...\n";
-        test_command(uart, "AT");
-        test_command(uart, "AT+GETVER");
-        test_command(uart, "AT+GETWORKMODE");
-        test_command(uart, "AT+GETCFG");
-        test_command(uart, "AT+GETSENSOR");
-        test_command(uart, "AT+TESTLED");
-        // test_command(*uart, "AT+TESTOLED");
-        test_command(uart, "AT+DISTANCE");
-        test_command(uart, "AT+GETDEV");
+        // test_command(uart, "AT");
+        // test_command(uart, "AT+GETVER");
+        // test_command(uart, "AT+GETWORKMODE");
+        // test_command(uart, "AT+GETCFG");
+        // test_command(uart, "AT+GETSENSOR");
+        // test_command(uart, "AT+TESTLED");
+        // // test_command(*uart, "AT+TESTOLED");
+        // test_command(uart, "AT+DISTANCE");
+        // test_command(uart, "AT+GETDEV");
 
         std::cout << "Sending test commands (readText)...\n";
         test_command2(uart, "AT+GETDEV");
 
+        BU04Handler handler(uart);
+        std::string version;
+        handler.GetVersion(version, std::chrono::milliseconds(500));
+        std::cout << "BU04 Version: " << version << std::endl;
   
         std::this_thread::sleep_for(std::chrono::seconds(1));
 

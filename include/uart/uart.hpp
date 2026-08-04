@@ -1,3 +1,6 @@
+#ifndef UART_HPP_
+#define UART_HPP_
+
 #include <cerrno>
 #include <cstring>
 #include <fcntl.h>
@@ -258,3 +261,4 @@ private:
         }
     }
 };
+#endif // UART_HPP_

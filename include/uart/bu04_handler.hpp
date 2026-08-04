@@ -1,23 +1,25 @@
 #ifndef BU04_HANDLER_HPP_
 #define BU04_HANDLER_HPP_
 
+#include "uart/iuart.hpp"
+
 class BU04Handler {
 public:
     enum class EResult {
         kSuccess,
         kTimeout,
+        kUnexpectedResponse,
         kError
     };
 
-    BU04Handler() = default;
-    ~BU04Handler() = default;
-
-    // EResult 
+    explicit BU04Handler(IUart& uart) : uart_(uart) {}
 
     void handleData(const char* data);
 
+    void GetVersion(std::string& version, std::chrono::milliseconds timeout);
+
 private:
     IUart& uart_;
-}
+};
 
 #endif // BU04_HANDLER_HPP_

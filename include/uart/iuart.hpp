@@ -1,6 +1,9 @@
+#ifndef IUART_HPP_
+#define IUART_HPP_
 
 #include <chrono>
 #include <span>
+#include <string>
 
 #include <cstddef>
 #include <cstdint>
@@ -35,3 +38,5 @@ public:
     };
 };
 
+
+#endif // IUART_HPP_
