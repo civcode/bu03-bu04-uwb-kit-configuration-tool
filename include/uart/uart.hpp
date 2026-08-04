@@ -47,61 +47,61 @@ public:
     Uart(Uart&&) noexcept = default;
     Uart& operator=(Uart&&) noexcept = default;
 
-    void write(std::span<const std::uint8_t> data) override
+    bool writeBytes(const std::uint8_t* data, std::size_t size) override
     {
         std::size_t totalWritten = 0;
 
-        while (totalWritten < data.size()) {
+        while (totalWritten < size) {
             const ssize_t written = ::write(
                 fd_,
-                data.data() + totalWritten,
-                data.size() - totalWritten);
+                data + totalWritten,
+                size - totalWritten);
 
             if (written > 0) {
                 totalWritten += static_cast<std::size_t>(written);
             } else if (written < 0 && errno == EINTR) {
                 continue;
             } else {
-                throw std::runtime_error(
-                    "UART write failed: " + std::string(std::strerror(errno)));
+                return false;
             }
         }
 
         // Wait until all bytes have physically left the transmitter.
         if (::tcdrain(fd_) != 0) {
-            throw std::runtime_error(
-                "tcdrain failed: " + std::string(std::strerror(errno)));
+            return false;
         }
+
+        return true;
     }
 
-    std::span<std::uint8_t> readSome(std::size_t maxBytes = 256)
-    {
-        std::vector<std::uint8_t> bufferInit(maxBytes, 0);
-        std::span<std::uint8_t> buffer(bufferInit);
+    // std::span<std::uint8_t> readSome(std::size_t maxBytes = 256)
+    // {
+    //     std::vector<std::uint8_t> bufferInit(maxBytes, 0);
+    //     std::span<std::uint8_t> buffer(bufferInit);
 
-        const ssize_t count = ::read(fd_, buffer.data(), buffer.size());
+    //     const ssize_t count = ::read(fd_, buffer.data(), buffer.size());
 
-        if (count > 0) {
-            // buffer. resize(static_cast<std::size_t>(count));
+    //     if (count > 0) {
+    //         // buffer. resize(static_cast<std::size_t>(count));
 
-            return buffer.first(count);
-        }
+    //         return buffer.first(count);
+    //     }
 
-        if (count == 0) {
-            // Timeout occurred.
-            return {};
-        }
+    //     if (count == 0) {
+    //         // Timeout occurred.
+    //         return {};
+    //     }
 
-        if (errno == EINTR) {
-            return {};
-        }
+    //     if (errno == EINTR) {
+    //         return {};
+    //     }
 
-        throw std::runtime_error(
-            "UART read failed: " + std::string(std::strerror(errno)));
-    }
+    //     throw std::runtime_error(
+    //         "UART read failed: " + std::string(std::strerror(errno)));
+    // }
     
-    std::size_t read(std::span<std::uint8_t> buffer, std::chrono::milliseconds firstByteTimeout,
-                                                     std::chrono::milliseconds interByteTimeout)
+    std::size_t read(std::uint8_t* buffer, std::size_t capacity, std::chrono::milliseconds firstByteTimeout,
+                     std::chrono::milliseconds interByteTimeout=std::chrono::milliseconds(50)) override
     {
         // std::string result;
         char read_buffer[256];
@@ -144,7 +144,7 @@ public:
 
                 if (count > 0) {
                     // result.append(read_buffer, static_cast<std::size_t>(count));
-                    const std::size_t available = buffer.size() - totalRead;
+                    const std::size_t available = capacity - totalRead;
                     if (available == 0) {
                         break;
                     }
@@ -154,12 +154,12 @@ public:
                         available);
 
                     std::memcpy(
-                        buffer.data() + totalRead,
+                        buffer + totalRead,
                         read_buffer,
                         toCopy);
                     totalRead += toCopy;
 
-                    if (totalRead >= buffer.size()) {
+                    if (totalRead >= capacity) {
                         break;
                     }
 
