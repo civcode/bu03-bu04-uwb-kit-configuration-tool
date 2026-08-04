@@ -115,6 +115,7 @@ int main(int argc, char* argv[])
         // test_command(uart, "AT+GETDEV");
 
         std::cout << "Sending test commands (readText)...\n";
+        test_command2(uart, "AT+GETVER");
         test_command2(uart, "AT+GETCFG");
         test_command2(uart, "AT+GETDEV");
 
@@ -126,6 +127,10 @@ int main(int argc, char* argv[])
         } else {
             std::cerr << "Failed to get BU04 version\n";
         }
+
+        std::string devCfg;
+        BU04Handler::DeviceConfiguration;
+        
 
         std::string devInfo;
         BU04Handler::TwrDeviceSetup setup;

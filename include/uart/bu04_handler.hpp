@@ -12,6 +12,13 @@ public:
         kError
     };
 
+    typedef struct DeviceConfiguration_ {
+        int id;
+        int role;
+        int channel;
+        int rate;
+    } DeviceConfiguration;
+
     typedef struct TwrDeviceSetup_ {
         int tagCapacity;
         int antennaDelay;
@@ -30,7 +37,10 @@ public:
     // void handleData(const char* data);
 
     EResult GetVersion(std::string& version);
+    EResult GetCfg(std::string & cfg, DeviceConfiguration& deviceConfig);
     EResult GetDev(std::string& devInfo, TwrDeviceSetup& setup);
+
+    EResult SetCfg;
 
 private:
     IUart& uart_;
