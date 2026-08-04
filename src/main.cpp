@@ -115,13 +115,35 @@ int main(int argc, char* argv[])
         // test_command(uart, "AT+GETDEV");
 
         std::cout << "Sending test commands (readText)...\n";
+        test_command2(uart, "AT+GETCFG");
         test_command2(uart, "AT+GETDEV");
 
         BU04Handler handler(uart);
         std::string version;
-        handler.GetVersion(version, std::chrono::milliseconds(500));
-        std::cout << "BU04 Version: " << version << std::endl;
-  
+        const auto result = handler.GetVersion(version);
+        if (result == BU04Handler::EResult::kSuccess) {
+            std::cout << "BU04 Version: " << version << std::endl;
+        } else {
+            std::cerr << "Failed to get BU04 version\n";
+        }
+
+        std::string devInfo;
+        BU04Handler::TwrDeviceSetup setup;
+        const auto devResult = handler.GetDev(devInfo, setup);
+        if (devResult == BU04Handler::EResult::kSuccess) {
+            std::cout << "BU04 Device Info: " << devInfo << std::endl;
+            std::cout << "Tag Capacity: " << setup.tagCapacity << std::endl;
+            std::cout << "Antenna Delay: " << setup.antennaDelay << std::endl;
+            std::cout << "Kalman Filter Enabled: " << std::boolalpha << setup.isKalmanFilterEnabled << std::endl;
+            std::cout << "Kalman Q: " << setup.kalmanQ << std::endl;
+            std::cout << "Kalman R: " << setup.kalmanR << std::endl;
+            std::cout << "Correction Parameter A: " << setup.correctionParameterA << std::endl;
+            std::cout << "Correction Parameter B: " << setup.correctionParameterB << std::endl;
+            std::cout << "Positioning Enabled: " << std::boolalpha << setup.isPositioningEnabled << std::endl;
+            std::cout << "Positioning Dimension: " << setup.positioningDimension << std::endl;
+        } else {
+            std::cerr << "Failed to get BU04 device info\n";
+        }
         std::this_thread::sleep_for(std::chrono::seconds(1));
 
 
