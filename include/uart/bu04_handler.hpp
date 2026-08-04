@@ -40,7 +40,7 @@ public:
     EResult GetCfg(std::string & cfg, DeviceConfiguration& deviceConfig);
     EResult GetDev(std::string& devInfo, TwrDeviceSetup& setup);
 
-    EResult SetCfg;
+    EResult SetCfg(const DeviceConfiguration& deviceConfig);
 
 private:
     IUart& uart_;

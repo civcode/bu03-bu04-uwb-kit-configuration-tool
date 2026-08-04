@@ -129,8 +129,17 @@ int main(int argc, char* argv[])
         }
 
         std::string devCfg;
-        BU04Handler::DeviceConfiguration;
-        
+        BU04Handler::DeviceConfiguration deviceConfig;
+        const auto cfgResult = handler.GetCfg(devCfg, deviceConfig);
+        if (cfgResult == BU04Handler::EResult::kSuccess) {
+            std::cout << "BU04 Device Configuration: " << devCfg << std::endl;
+            std::cout << "ID: " << deviceConfig.id << std::endl;
+            std::cout << "Role: " << deviceConfig.role << std::endl;
+            std::cout << "Channel: " << deviceConfig.channel << std::endl;
+            std::cout << "Rate: " << deviceConfig.rate << std::endl;
+        } else {
+            std::cerr << "Failed to get BU04 device configuration\n";
+        }
 
         std::string devInfo;
         BU04Handler::TwrDeviceSetup setup;
@@ -149,6 +158,19 @@ int main(int argc, char* argv[])
         } else {
             std::cerr << "Failed to get BU04 device info\n";
         }
+
+        deviceConfig.id = 0;
+        deviceConfig.role = 0;
+        deviceConfig.channel = 0;
+        deviceConfig.rate = 1;
+        const auto setCfgResult = handler.SetCfg(deviceConfig);
+        if (setCfgResult == BU04Handler::EResult::kSuccess) {
+            std::cout << "Successfully set BU04 device configuration\n";
+        } else {
+            std::cerr << "Failed to set BU04 device configuration\n";
+        }
+
+
         std::this_thread::sleep_for(std::chrono::seconds(1));
 
 
