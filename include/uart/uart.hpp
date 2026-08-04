@@ -8,7 +8,13 @@
 #include <termios.h>
 #include <unistd.h>
 
-class Uart {
+#include <chrono>
+#include <span>
+#include <vector>
+
+#include "uart/iuart.hpp"
+
+class Uart final : public IUart {
 public:
     Uart(const std::string& device, speed_t baudRate)
         : fd_(-1)
@@ -28,7 +34,7 @@ public:
         }
     }
 
-    ~Uart()
+    ~Uart() override
     {
         if (fd_ >= 0) {
             ::close(fd_);
@@ -38,7 +44,10 @@ public:
     Uart(const Uart&) = delete;
     Uart& operator=(const Uart&) = delete;
 
-    void writeAll(const std::string& data)
+    Uart(Uart&&) noexcept = default;
+    Uart& operator=(Uart&&) noexcept = default;
+
+    void write(std::span<const std::uint8_t> data) override
     {
         std::size_t totalWritten = 0;
 
@@ -65,15 +74,17 @@ public:
         }
     }
 
-    std::string readSome(std::size_t maxBytes = 256)
+    std::span<std::uint8_t> readSome(std::size_t maxBytes = 256)
     {
-        std::string buffer(maxBytes, '\0');
+        std::vector<std::uint8_t> bufferInit(maxBytes, 0);
+        std::span<std::uint8_t> buffer(bufferInit);
 
         const ssize_t count = ::read(fd_, buffer.data(), buffer.size());
 
         if (count > 0) {
-            buffer.resize(static_cast<std::size_t>(count));
-            return buffer;
+            // buffer. resize(static_cast<std::size_t>(count));
+
+            return buffer.first(count);
         }
 
         if (count == 0) {
@@ -89,13 +100,14 @@ public:
             "UART read failed: " + std::string(std::strerror(errno)));
     }
     
-    std::string readAll(int firstByteTimeoutMs = 1000,
-                        int interByteTimeoutMs = 50)
+    std::size_t read(std::span<std::uint8_t> buffer, std::chrono::milliseconds firstByteTimeout,
+                                                     std::chrono::milliseconds interByteTimeout)
     {
-        std::string result;
-        char buffer[256];
+        // std::string result;
+        char read_buffer[256];
+        std::size_t totalRead = 0;
 
-        int timeoutMs = firstByteTimeoutMs;
+        int timeoutMs = firstByteTimeout.count();
 
         while (true) {
             pollfd descriptor{};
@@ -127,15 +139,33 @@ public:
                 ssize_t count;
 
                 do {
-                    count = ::read(fd_, buffer, sizeof(buffer));
+                    count = ::read(fd_, read_buffer, sizeof(read_buffer));
                 } while (count < 0 && errno == EINTR);
 
                 if (count > 0) {
-                    result.append(buffer, static_cast<std::size_t>(count));
+                    // result.append(read_buffer, static_cast<std::size_t>(count));
+                    const std::size_t available = buffer.size() - totalRead;
+                    if (available == 0) {
+                        break;
+                    }
+
+                    const std::size_t toCopy = std::min(
+                        static_cast<std::size_t>(count),
+                        available);
+
+                    std::memcpy(
+                        buffer.data() + totalRead,
+                        read_buffer,
+                        toCopy);
+                    totalRead += toCopy;
+
+                    if (totalRead >= buffer.size()) {
+                        break;
+                    }
 
                     // After receiving the first bytes, use the shorter
                     // timeout to detect the end of the message.
-                    timeoutMs = interByteTimeoutMs;
+                    timeoutMs = interByteTimeout.count();
                     continue;
                 }
 
@@ -153,7 +183,7 @@ public:
             }
         }
 
-        return result;
+        return totalRead;
     }
 
 private:

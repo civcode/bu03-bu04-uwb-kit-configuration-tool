@@ -4,6 +4,8 @@
 #include <string>
 #include <iomanip>
 #include <iostream>
+
+#include <span>
 #include <thread>
 
 #include "uart/uart.hpp"
@@ -25,10 +27,19 @@ namespace
 void test_command(Uart& uart, const std::string& command)
 {
     std::cout << "Sending command: " << command << std::endl << std::flush;
-    uart.writeAll(command + "\r\n");
+    std::string commandWithCRLF = command + "\r\n";
+    std::span<const std::uint8_t> commandSpan(
+        reinterpret_cast<const std::uint8_t*>(commandWithCRLF.data()),
+        commandWithCRLF.size());
+    uart.write(commandSpan);
 
     // const std::string received = uart.readSome();
-    const std::string received = uart.readAll();
+    std::array<std::uint8_t, 256> bufferStorage{};
+    std::span<std::uint8_t> buffer(bufferStorage);
+    const std::size_t bytesRead = uart.read(buffer, std::chrono::milliseconds(500), std::chrono::milliseconds(50));
+    const std::string received(
+        reinterpret_cast<const char*>(buffer.data()),
+        bytesRead);
     if (!received.empty()) {
         std::cout << "Received " << received.size()
                   << " bytes: " << std::endl << std::flush;
@@ -55,20 +66,20 @@ int main(int argc, char* argv[])
     std::signal(SIGINT, handle_signal);
 
     try {
-        Uart uart(device, B115200);
+        auto uart = Uart::open(device, B115200);
 
         std::cout << "Opened " << device << " at 115200 baud\n";
 
         std::cout << "Sending test commands...\n";
-        test_command(uart, "AT");
-        test_command(uart, "AT+GETVER");
-        test_command(uart, "AT+GETWORKMODE");
-        test_command(uart, "AT+GETCFG");
-        test_command(uart, "AT+GETSENSOR");
-        test_command(uart, "AT+TESTLED");
-        // test_command(uart, "AT+TESTOLED");
-        test_command(uart, "AT+DISTANCE");
-        test_command(uart, "AT+GETDEV");
+        test_command(*uart, "AT");
+        test_command(*uart, "AT+GETVER");
+        test_command(*uart, "AT+GETWORKMODE");
+        test_command(*uart, "AT+GETCFG");
+        test_command(*uart, "AT+GETSENSOR");
+        test_command(*uart, "AT+TESTLED");
+        // test_command(*uart, "AT+TESTOLED");
+        test_command(*uart, "AT+DISTANCE");
+        test_command(*uart, "AT+GETDEV");
 
   
         std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -78,14 +89,14 @@ int main(int argc, char* argv[])
         // uart.writeAll("Hello from Linux C++!\r\n");
         // uart.writeAll("AT\r\n");
 
-        const std::string received = uart.readSome();
+        const std::string received = uart->readSome();
         if (!received.empty()) {
             std::cout << "Received " << received.size()
                       << " bytes: " << received << std::flush;
         }
 
         while (!stop_requested.test()) {
-            const std::string received = uart.readSome();
+            const std::string received = uart->readSome();
 
             if (!received.empty()) {
                 std::cout << "Received " << received.size()

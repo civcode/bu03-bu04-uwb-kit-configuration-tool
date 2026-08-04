@@ -3,7 +3,7 @@
 #include <span>
 
 #include <cstddef>
-#include <cstdin>
+#include <cstdint>
 
 class IUart {
 public:
