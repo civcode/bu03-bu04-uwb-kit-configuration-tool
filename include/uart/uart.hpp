@@ -47,7 +47,7 @@ public:
     Uart(Uart&&) noexcept = default;
     Uart& operator=(Uart&&) noexcept = default;
 
-    bool writeBytes(const std::uint8_t* data, std::size_t size) override
+    bool write(const std::uint8_t* data, std::size_t size) override
     {
         std::size_t totalWritten = 0;
 
@@ -100,7 +100,8 @@ public:
     //         "UART read failed: " + std::string(std::strerror(errno)));
     // }
     
-    std::size_t read(std::uint8_t* buffer, std::size_t capacity, std::chrono::milliseconds firstByteTimeout,
+    std::size_t read(std::uint8_t* buffer, std::size_t capacity, 
+                     std::chrono::milliseconds firstByteTimeout=std::chrono::milliseconds(500),
                      std::chrono::milliseconds interByteTimeout=std::chrono::milliseconds(50)) override
     {
         // std::string result;

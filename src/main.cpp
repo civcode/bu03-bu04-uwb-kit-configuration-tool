@@ -54,6 +54,42 @@ void test_command(Uart& uart, const std::string& command)
     std::cout << std::dec << "\n\n";
 }
 
+void test_command2(Uart& uart, const std::string& command)
+{
+    uart.writeText(command + "\r\n");
+
+    std::string received;
+    uart.readText(received, 256);
+
+    std::cout << received << std::flush;
+    std::cout << std::endl;
+
+
+    // const std::string received = uart.readSome();
+//     std::uint8_t buffer[256];
+//     const std::size_t bytesRead = uart.read(buffer, 256, std::chrono::milliseconds(500));
+//     const std::string received(
+//         reinterpret_cast<const char*>(buffer),
+//         bytesRead);
+
+//     if (!received.empty()) {
+//         std::cout << "Received " << received.size()
+//                   << " bytes: " << std::endl << std::flush;
+//         std::cout << received << std::flush;
+//     } else {
+//         std::cout << "Read timeout\n";
+//     }
+//     for (unsigned char ch : received) {
+//         std::cout << std::hex
+//                 << std::setw(2)
+//                 << std::setfill('0')
+//                 << static_cast<int>(ch)
+//                 << ' ';
+//     }
+
+//     std::cout << std::dec << "\n\n";
+}
+
 int main(int argc, char* argv[])
 {
     const std::string device =
@@ -73,9 +109,12 @@ int main(int argc, char* argv[])
         test_command(uart, "AT+GETCFG");
         test_command(uart, "AT+GETSENSOR");
         test_command(uart, "AT+TESTLED");
-        // test_command(uart, "AT+TESTOLED");
+        // test_command(*uart, "AT+TESTOLED");
         test_command(uart, "AT+DISTANCE");
         test_command(uart, "AT+GETDEV");
+
+        std::cout << "Sending test commands (readText)...\n";
+        test_command2(uart, "AT+GETDEV");
 
   
         std::this_thread::sleep_for(std::chrono::seconds(1));
