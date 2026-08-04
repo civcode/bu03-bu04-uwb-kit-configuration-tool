@@ -2,6 +2,7 @@
 #include <chrono>
 #include <csignal>
 #include <string>
+#include <iomanip>
 #include <iostream>
 #include <thread>
 
@@ -35,6 +36,15 @@ void test_command(Uart& uart, const std::string& command)
     } else {
         std::cout << "Read timeout\n";
     }
+    for (unsigned char ch : received) {
+        std::cout << std::hex
+                << std::setw(2)
+                << std::setfill('0')
+                << static_cast<int>(ch)
+                << ' ';
+    }
+
+    std::cout << std::dec << "\n\n";
 }
 
 int main(int argc, char* argv[])

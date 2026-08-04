@@ -90,7 +90,7 @@ public:
     }
     
     std::string readAll(int firstByteTimeoutMs = 1000,
-                    int interByteTimeoutMs = 50)
+                        int interByteTimeoutMs = 50)
     {
         std::string result;
         char buffer[256];
