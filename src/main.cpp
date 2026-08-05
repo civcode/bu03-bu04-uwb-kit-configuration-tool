@@ -212,7 +212,8 @@ int main(int argc, char* argv[])
 
         result = handler.GetDeca(response);
         if (result == BU04Handler::EResult::kSuccess) {
-            std::cout << "BU04 Deca Response: " << response << std::endl;
+            // std::cout << "BU04 Deca Response: " << response << std::endl;
+            handler.PrintAllChar(response);
         } else {
             std::cerr << "Failed to get BU04 deca response\n";
         }
