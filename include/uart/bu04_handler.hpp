@@ -60,6 +60,8 @@ public:
     EResult GetDList(std::string& response);
     EResult GetKList(std::string& response);
 
+    EResult GetUwbMode(std::string& response, int& uwbMode);
+
     EResult TestLed(std::string& response, int state);
     EResult TestOled(std::string& response);
 
@@ -67,6 +69,8 @@ public:
     EResult SetWorkMode(int workMode);
     EResult SetCfg(const DeviceConfiguration& deviceConfig);
     EResult SetDev(const TwrDeviceSetup& setup);
+
+    EResult SetUwbMode(int uwbMode);
 
     void PrintHex(const std::string& str);
     void PrintAllChar(const std::string_view text);

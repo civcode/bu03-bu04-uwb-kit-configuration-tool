@@ -365,6 +365,30 @@ EResult BU04Handler::GetKList(std::string &response)
     return EResult::kSuccess;
 }
 
+EResult BU04Handler::GetUwbMode(std::string &response, int &uwbMode)
+{
+    std::cout << "GetUwbMode() called" << std::endl;
+
+    EResult result;
+    const std::string command = "AT+GETUWBMODE\r\n";
+    std::string received;
+    result = HandleComm(command, received);
+    response = received;
+
+    if (result != EResult::kSuccess) {
+        return result;
+    }
+
+    std::string data;
+    if (ExtractDataString(received, "uwbmode:", ",", data) == EResult::kSuccess) {
+        uwbMode = std::stoi(data);
+    } else {
+        return EResult::kUnexpectedResponse;
+    }
+
+    return EResult::kSuccess;
+}
+
 EResult BU04Handler::ExtractErrorCode(const std::string& response)
 {
     if (response.find("OK") != std::string::npos) {
