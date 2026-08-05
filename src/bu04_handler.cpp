@@ -380,7 +380,7 @@ EResult BU04Handler::GetUwbMode(std::string &response, int &uwbMode)
     }
 
     std::string data;
-    if (ExtractDataString(received, "uwbmode:", ",", data) == EResult::kSuccess) {
+    if (ExtractDataString(received, "twr_pdoa_mode:", ",", data) == EResult::kSuccess) {
         uwbMode = std::stoi(data);
     } else {
         return EResult::kUnexpectedResponse;
@@ -611,6 +611,21 @@ EResult BU04Handler::SetDev(const TwrDeviceSetup &setup)
 
     return EResult();
 }
+
+EResult BU04Handler::SetUwbMode(int uwbMode)
+{
+    EResult result;
+    const std::string command = "AT+SETUWBMODE=" + std::to_string(uwbMode) + "\r\n";
+    std::string received;
+    result = HandleComm(command, received);
+
+    if (result != EResult::kSuccess) {
+        return result;
+    }
+
+    return EResult::kSuccess;
+}
+
 void BU04Handler::PrintHex(const std::string &str)
 {
     for (const unsigned char c : str) {

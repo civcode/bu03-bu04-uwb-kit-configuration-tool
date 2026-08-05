@@ -245,6 +245,18 @@ int main(int argc, char* argv[])
             std::cerr << "Failed to get BU04 UWB mode\n";
         }
         std::cout << std::endl;
+
+        uwbMode = 0;
+        result = handler.SetUwbMode(uwbMode);
+        if (result == BU04Handler::EResult::kSuccess) {
+            std::cout << "Successfully set BU04 UWB mode to " << uwbMode << "\n";
+        } else {
+            std::cerr << "Failed to set BU04 UWB mode\n";
+        }
+        std::cout << std::endl;
+
+
+
         return 0;
 
         // deviceConfig.id = 1;
