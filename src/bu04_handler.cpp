@@ -365,6 +365,75 @@ EResult BU04Handler::GetKList(std::string &response)
     return EResult::kSuccess;
 }
 
+EResult BU04Handler::GetPdoaCfg(std::string &response, PdoaConfiguration &pdoaCfg)
+{
+    std::cout << "GetPdoaCfg() called" << std::endl;
+
+    EResult result;
+    const std::string command = "AT+PDOAGETCFG\r\n";
+    std::string received;
+    result = HandleComm(command, received);
+    response = received;
+
+    if (result != EResult::kSuccess) {
+        return result;
+    }
+
+    std::string data;
+
+    try {
+        if (ExtractDataString(received, "Dlist:", " ", data) == EResult::kSuccess) {
+            pdoaCfg.dlist = std::stoi(data);
+        } else {
+            return EResult::kUnexpectedResponse;
+        }
+        if (ExtractDataString(received, "KList:", ",", data) == EResult::kSuccess) {
+            pdoaCfg.klist = std::stoi(data);
+        } else {
+            return EResult::kUnexpectedResponse;
+        }
+        if (ExtractDataString(received, "Net:", ",", data) == EResult::kSuccess) {
+            pdoaCfg.net = std::stoi(data);
+        } else {
+            return EResult::kUnexpectedResponse;
+        }
+        if (ExtractDataString(received, "AncID:", ",", data) == EResult::kSuccess) {
+            pdoaCfg.anchId = std::stoi(data);
+        } else {
+            return EResult::kUnexpectedResponse;
+        }
+        if (ExtractDataString(received, "Rate:", ",", data) == EResult::kSuccess) {
+            pdoaCfg.rate = std::stoi(data);
+        } else {
+            return EResult::kUnexpectedResponse;
+        }
+        if (ExtractDataString(received, "Filter:", ",", data) == EResult::kSuccess) {
+            pdoaCfg.isFilterEnabled = (data == "1");
+        } else {
+            return EResult::kUnexpectedResponse;
+        }
+        if (ExtractDataString(received, "UserCmd:", ",", data) == EResult::kSuccess) {
+            pdoaCfg.userCmd = std::stoi(data);
+        } else {
+            return EResult::kUnexpectedResponse;
+        }
+        if (ExtractDataString(received, "pdoaOffset:", ",", data) == EResult::kSuccess) {
+            pdoaCfg.pdoaOffset = std::stoi(data);
+        } else {
+            return EResult::kUnexpectedResponse;
+        }
+        if (ExtractDataString(received, "rngOffset:", ",", data) == EResult::kSuccess) {
+            pdoaCfg.rngOffset = std::stoi(data);
+        } else {
+            return EResult::kUnexpectedResponse;
+        }
+    } catch (const std::invalid_argument&) {
+        return EResult::kUnexpectedResponse;
+    }
+
+    return EResult::kSuccess;
+}
+
 EResult BU04Handler::GetUwbMode(std::string &response, int &uwbMode)
 {
     std::cout << "GetUwbMode() called" << std::endl;
@@ -619,10 +688,42 @@ EResult BU04Handler::SetDev(const TwrDeviceSetup &setup)
     return result;
 }
 
+EResult BU04Handler::SetPdoaOffset(int offset)
+{
+    std::cout << "SetPdoaOffset() called" << std::endl;
+
+    EResult result;
+    const std::string command = "AT+PDOAOFF=" + std::to_string(offset) + "\r\n";
+    std::string received;
+    result = HandleComm(command, received);
+
+    if (result != EResult::kSuccess) {
+        return result;
+    }
+
+    return EResult::kSuccess;
+}
+
+EResult BU04Handler::SetRngOffset(int offset)
+{
+    std::cout << "SetRngOffset() called" << std::endl;
+
+    EResult result;
+    const std::string command = "AT+RNGOFF=" + std::to_string(offset) + "\r\n";
+    std::string received;
+    result = HandleComm(command, received);
+
+    if (result != EResult::kSuccess) {
+        return result;
+    }
+
+    return EResult::kSuccess;
+}
+
 EResult BU04Handler::SetUwbMode(int uwbMode)
 {
     std::cout << "SetUwbMode() called" << std::endl;
-    
+
     EResult result;
     const std::string command = "AT+SETUWBMODE=" + std::to_string(uwbMode) + "\r\n";
     std::string received;

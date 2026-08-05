@@ -41,6 +41,18 @@ public:
         int positioningDimension;
     } TwrDeviceSetup;
 
+    typedef struct PdoaConfiguration_ {
+        int dlist;
+        int klist;
+        int net;
+        int anchId;
+        int rate;
+        bool isFilterEnabled;
+        int userCmd;
+        int pdoaOffset;
+        int rngOffset;
+    } PdoaConfiguration;
+
     explicit BU04Handler(IUart& uart, std::chrono::milliseconds timeout = std::chrono::milliseconds(1000))
         : uart_(uart), timeout_(timeout), timePrevTx_(std::chrono::high_resolution_clock::now()) {}
 
@@ -59,7 +71,7 @@ public:
     EResult GetDeca(std::string& response);
     EResult GetDList(std::string& response);
     EResult GetKList(std::string& response);
-
+    EResult GetPdoaCfg(std::string& response, PdoaConfiguration& pdoaCfg);
     EResult GetUwbMode(std::string& response, int& uwbMode);
 
     EResult TestLed(std::string& response, int state);
@@ -69,6 +81,8 @@ public:
     EResult SetWorkMode(int workMode);
     EResult SetCfg(const DeviceConfiguration& deviceConfig);
     EResult SetDev(const TwrDeviceSetup& setup);
+    EResult SetPdoaOffset(int offset); // angle offset in deg
+    EResult SetRngOffset(int offset); // distance offset in mm
 
     EResult SetUwbMode(int uwbMode);
 

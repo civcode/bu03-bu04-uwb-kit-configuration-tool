@@ -264,6 +264,41 @@ int main(int argc, char* argv[])
         }
         std::cout << std::endl;
 
+        int pdoaOffset = 0;
+        result = handler.SetPdoaOffset(pdoaOffset);
+        if (result == BU04Handler::EResult::kSuccess) {
+            std::cout << "Successfully set BU04 PDoA offset to " << pdoaOffset << " degrees\n";
+        } else {
+            std::cerr << "Failed to set BU04 PDoA offset\n";
+        }
+        std::cout << std::endl;
+
+        int rngOffset = 0;
+        result = handler.SetRngOffset(rngOffset);
+        if (result == BU04Handler::EResult::kSuccess) {
+            std::cout << "Successfully set BU04 range offset to " << rngOffset << " mm\n";
+        } else {
+            std::cerr << "Failed to set BU04 range offset\n";
+        }
+        std::cout << std::endl; 
+
+        BU04Handler::PdoaConfiguration pdoaCfg;
+        result = handler.GetPdoaCfg(response, pdoaCfg);
+        if (result == BU04Handler::EResult::kSuccess) {
+            std::cout << "BU04 PDoA Configuration: " << response << std::endl;
+            std::cout << "Dlist: " << pdoaCfg.dlist << std::endl;
+            std::cout << "KList: " << pdoaCfg.klist << std::endl;
+            std::cout << "Net: " << pdoaCfg.net << std::endl;
+            std::cout << "AncID: " << pdoaCfg.anchId << std::endl;
+            std::cout << "Rate: " << pdoaCfg.rate << std::endl;
+            std::cout << "Filter Enabled: " << std::boolalpha << pdoaCfg.isFilterEnabled << std::endl;
+            std::cout << "UserCmd: " << pdoaCfg.userCmd << std::endl;
+            std::cout << "PDoA Offset: " << pdoaCfg.pdoaOffset << std::endl;
+            std::cout << "Range Offset: " << pdoaCfg.rngOffset << std::endl;
+        } else {
+            std::cerr << "Failed to get BU04 PDoA configuration\n";
+        }
+        std::cout << std::endl;
 
 
         return 0;
