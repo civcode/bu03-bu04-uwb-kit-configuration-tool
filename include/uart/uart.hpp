@@ -104,8 +104,8 @@ public:
     // }
     
     std::size_t read(std::uint8_t* buffer, std::size_t capacity, 
-                     std::chrono::milliseconds firstByteTimeout=std::chrono::milliseconds(500),
-                     std::chrono::milliseconds interByteTimeout=std::chrono::milliseconds(50)) override
+                     std::chrono::milliseconds firstByteTimeout=std::chrono::milliseconds(1000),
+                     std::chrono::milliseconds interByteTimeout=std::chrono::milliseconds(200)) override
     {
         // std::string result;
         char read_buffer[256];
@@ -247,7 +247,7 @@ private:
          * VTIME is measured in tenths of a second.
          */
         tty.c_cc[VMIN] = 0;
-        tty.c_cc[VTIME] = 10; // time in 100 ms
+        tty.c_cc[VTIME] = 10; // time in 100 ms => 10*0.1 = 1 s
 
         if (::tcsetattr(fd_, TCSANOW, &tty) != 0) {
             throw std::runtime_error(

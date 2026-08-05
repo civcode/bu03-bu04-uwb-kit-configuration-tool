@@ -11,19 +11,19 @@ public:
         kSuccess,
         kTimeout,
         kUnexpectedResponse,
-        kUartError,
+        // kUartError,
         kError
     };
 
-    enum class EResponseCode {
-        kSuccess,
-        kError
-    };
+    // enum class EResponseCode {
+    //     kSuccess,
+    //     kError
+    // };
 
-    typedef struct ResponseData_ {
-        std::string str;
-        EResponseCode code;
-    } ResponseData;
+    // typedef struct ResponseData_ {
+    //     std::string str;
+    //     EResponseCode code;
+    // } ResponseData;
 
     typedef struct DeviceConfiguration_ {
         int id;
@@ -49,12 +49,12 @@ public:
 
     // void handleData(const char* data);
 
-    EResult SaveCfg();
-    EResult GetVersion(std::string& version);
-    EResult GetCfg(std::string & cfg, DeviceConfiguration& deviceConfig);
-    EResult GetDistance(std::string& distanceInfo, float& distance);
-    EResult GetDev(std::string& devInfo, TwrDeviceSetup& setup);
-    EResult GetDList(std::string& dlist);
+    EResult SaveCfg(std::string& response);
+    EResult GetVersion(std::string& response, std::string& version);
+    EResult GetCfg(std::string& response, DeviceConfiguration& deviceConfig);
+    EResult GetDistance(std::string& response, float& distance);
+    EResult GetDev(std::string& response, TwrDeviceSetup& setup);
+    EResult GetDList(std::string& response);
 
     EResult SetCfg(const DeviceConfiguration& deviceConfig);
     EResult SetDev(const TwrDeviceSetup& setup);
@@ -66,7 +66,10 @@ private:
     IUart& uart_;
     std::chrono::milliseconds timeout_;
 
-    void ParseResponse(const std::string& response, ResponseData& responseData);
+    // EResult ParseResponse(const std::string& response, ResponseData& responseData);
+    EResult ParseResponse(std::string& response);
+
+    EResult HandleComm(const std::string& command, std::string& response);
 
     EResult ExtractDataString(const std::string& str, const std::string& prefix, 
         const std::string delimiter, std::string& data);

@@ -105,7 +105,7 @@ int main(int argc, char* argv[])
 
         std::cout << "Opened " << device << " at 115200 baud\n";
 
-        std::cout << "Sending test commands...\n";
+        // std::cout << "Sending test commands...\n";
         // test_command(uart, "AT");
         // test_command(uart, "AT+GETVER");
         // test_command(uart, "AT+GETWORKMODE");
@@ -116,19 +116,22 @@ int main(int argc, char* argv[])
         // test_command(uart, "AT+DISTANCE");
         // test_command(uart, "AT+GETDEV");
 
-        std::cout << "Sending test commands (readText)...\n";
+        // std::cout << "Sending test commands (readText)...\n";
         // test_command2(uart, "AT+GETVER");
         // test_command2(uart, "AT+GETCFG");
         // test_command2(uart, "AT+GETDEV");
 
         BU04Handler handler(uart);
+
+        std::string response;
         std::string version;
-        const auto result = handler.GetVersion(version);
+        const auto result = handler.GetVersion(response, version);
         if (result == BU04Handler::EResult::kSuccess) {
             std::cout << "BU04 Version: " << version << std::endl;
         } else {
             std::cerr << "Failed to get BU04 version\n";
         }
+        std::cout << std::endl;
 
         std::string devCfg;
         BU04Handler::DeviceConfiguration deviceConfig;
@@ -142,7 +145,9 @@ int main(int argc, char* argv[])
         } else {
             std::cerr << "Failed to get BU04 device configuration\n";
         }
+        std::cout << std::endl;
 
+        
         std::string devInfo;
         BU04Handler::TwrDeviceSetup setup;
         const auto devResult = handler.GetDev(devInfo, setup);
@@ -160,8 +165,9 @@ int main(int argc, char* argv[])
         } else {
             std::cerr << "Failed to get BU04 device info\n";
         }
+        std::cout << std::endl;
 
-        deviceConfig.id = 0;
+        deviceConfig.id = 1;
         deviceConfig.role = 0;
         deviceConfig.channel = 0;
         deviceConfig.rate = 1;
@@ -171,7 +177,7 @@ int main(int argc, char* argv[])
         } else {
             std::cerr << "Failed to set BU04 device configuration\n";
         }
-        // return 0;
+        std::cout << std::endl;
 
         float distance;
         std::string distanceInfo;
@@ -182,7 +188,9 @@ int main(int argc, char* argv[])
         } else {
             std::cerr << "Failed to get BU04 distance info\n";
         }
+        std::cout << std::endl;
 
+        return 0;
         // return 0;
         setup.tagCapacity = 2;
         handler.SetDev(setup);
