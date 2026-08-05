@@ -3,14 +3,27 @@
 
 #include "uart/iuart.hpp"
 
+#include <string_view>
+
 class BU04Handler {
 public:
     enum class EResult {
         kSuccess,
         kTimeout,
         kUnexpectedResponse,
+        kUartError,
         kError
     };
+
+    enum class EResponseCode {
+        kSuccess,
+        kError
+    };
+
+    typedef struct ResponseData_ {
+        std::string str;
+        EResponseCode code;
+    } ResponseData;
 
     typedef struct DeviceConfiguration_ {
         int id;
@@ -36,18 +49,32 @@ public:
 
     // void handleData(const char* data);
 
+    EResult SaveCfg();
     EResult GetVersion(std::string& version);
     EResult GetCfg(std::string & cfg, DeviceConfiguration& deviceConfig);
+    EResult GetDistance(std::string& distanceInfo, float& distance);
     EResult GetDev(std::string& devInfo, TwrDeviceSetup& setup);
+    EResult GetDList(std::string& dlist);
 
     EResult SetCfg(const DeviceConfiguration& deviceConfig);
+    EResult SetDev(const TwrDeviceSetup& setup);
+
+    void PrintHex(const std::string& str);
+    void PrintAllChar(const std::string_view text);
 
 private:
     IUart& uart_;
     std::chrono::milliseconds timeout_;
 
+    void ParseResponse(const std::string& response, ResponseData& responseData);
+
     EResult ExtractDataString(const std::string& str, const std::string& prefix, 
         const std::string delimiter, std::string& data);
+
+    inline void RemoveTerminator(std::string& str) {
+        str.erase(str.find_last_not_of(" \r\n") + 1);
+    }
+
 };
 
 #endif // BU04_HANDLER_HPP_

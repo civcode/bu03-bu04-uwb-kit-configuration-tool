@@ -57,11 +57,13 @@ void test_command(Uart& uart, const std::string& command)
 
 void test_command2(Uart& uart, const std::string& command)
 {
+    std::cout << "Sending command: " << command << std::endl;
     uart.writeText(command + "\r\n");
 
     std::string received;
     uart.readText(received, 256);
 
+    // PrintAllChar(received);
     std::cout << received << std::flush;
     std::cout << std::endl;
 
@@ -115,9 +117,9 @@ int main(int argc, char* argv[])
         // test_command(uart, "AT+GETDEV");
 
         std::cout << "Sending test commands (readText)...\n";
-        test_command2(uart, "AT+GETVER");
-        test_command2(uart, "AT+GETCFG");
-        test_command2(uart, "AT+GETDEV");
+        // test_command2(uart, "AT+GETVER");
+        // test_command2(uart, "AT+GETCFG");
+        // test_command2(uart, "AT+GETDEV");
 
         BU04Handler handler(uart);
         std::string version;
@@ -169,7 +171,21 @@ int main(int argc, char* argv[])
         } else {
             std::cerr << "Failed to set BU04 device configuration\n";
         }
+        // return 0;
 
+        float distance;
+        std::string distanceInfo;
+        const auto distanceResult = handler.GetDistance(distanceInfo, distance);
+        if (distanceResult == BU04Handler::EResult::kSuccess) {
+            std::cout << "BU04 Distance Info: " << distanceInfo << std::endl;
+            std::cout << "Distance: " << distance << " meters" << std::endl;
+        } else {
+            std::cerr << "Failed to get BU04 distance info\n";
+        }
+
+        // return 0;
+        setup.tagCapacity = 2;
+        handler.SetDev(setup);
 
         std::this_thread::sleep_for(std::chrono::seconds(1));
 
