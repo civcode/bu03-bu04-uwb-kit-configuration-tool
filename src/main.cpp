@@ -211,6 +211,8 @@ int main(int argc, char* argv[])
         // }
 
         setup.tagCapacity = 2;
+        setup.correctionParameterA = 1.0f;
+        setup.correctionParameterB = 0.0f;
         result = handler.SetDev(setup);
         if (result == BU04Handler::EResult::kSuccess) {
             std::cout << "Successfully set BU04 device info\n";
