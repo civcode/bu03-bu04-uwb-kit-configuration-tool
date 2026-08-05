@@ -50,8 +50,34 @@ public:
     Uart(Uart&&) noexcept = default;
     Uart& operator=(Uart&&) noexcept = default;
 
+    void flushUartBuffers()
+    {
+        if (::tcflush(fd_, TCIOFLUSH) != 0) {
+            throw std::runtime_error(
+                "tcflush failed: " + std::string(std::strerror(errno)));
+        }
+    }
+
+    void flushTxBuffer()
+    {
+        if (::tcflush(fd_, TCOFLUSH) != 0) {
+            throw std::runtime_error(
+                "tcflush failed: " + std::string(std::strerror(errno)));
+        }
+    }
+
+    void flushRxBuffer()
+    {
+        if (::tcflush(fd_, TCIFLUSH) != 0) {
+            throw std::runtime_error(
+                "tcflush failed: " + std::string(std::strerror(errno)));
+        }
+    }
+
     bool write(const std::uint8_t* data, std::size_t size) override
     {
+        flushRxBuffer();
+
         std::size_t totalWritten = 0;
 
         while (totalWritten < size) {
@@ -107,6 +133,7 @@ public:
                      std::chrono::milliseconds firstByteTimeout=std::chrono::milliseconds(1000),
                      std::chrono::milliseconds interByteTimeout=std::chrono::milliseconds(200)) override
     {
+        flushTxBuffer();
         // std::string result;
         char read_buffer[256];
         std::size_t totalRead = 0;
@@ -187,6 +214,7 @@ public:
             }
         }
 
+        // flushUartBuffers();
         return totalRead;
     }
 
