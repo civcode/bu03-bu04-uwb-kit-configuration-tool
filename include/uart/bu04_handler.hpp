@@ -22,6 +22,13 @@ public:
         int rate;
     } DeviceConfiguration;
 
+    typedef struct SensorData_ {
+        float accX;
+        float accY;
+        float accZ;
+        float angle;
+    } SensorData;
+
     typedef struct TwrDeviceSetup_ {
         int tagCapacity;
         int antennaDelay;
@@ -38,17 +45,26 @@ public:
         : uart_(uart), timeout_(timeout), timePrevTx_(std::chrono::high_resolution_clock::now()) {}
 
     // void handleData(const char* data);
-    EResult SaveCfg(std::string& response);
+    EResult Save(std::string& response);
     EResult Restart(std::string& response);
     EResult Restore(std::string& response);
 
     EResult GetAt(std::string& response);
-    EResult GetVersion(std::string& response, std::string& version);
+    EResult GetVer(std::string& response, std::string& version);
+    EResult GetWorkMode(std::string& response, int& workMode);
     EResult GetCfg(std::string& response, DeviceConfiguration& deviceConfig);
+    EResult GetSensor(std::string& response, SensorData& sensorData);
     EResult GetDistance(std::string& response, float& distance);
     EResult GetDev(std::string& response, TwrDeviceSetup& setup);
+    EResult GetDeca(std::string& response);
     EResult GetDList(std::string& response);
+    EResult GetKList(std::string& response);
 
+    EResult TestLed(std::string& response, int state);
+    EResult TestOled(std::string& response);
+
+
+    EResult SetWorkMode(int workMode);
     EResult SetCfg(const DeviceConfiguration& deviceConfig);
     EResult SetDev(const TwrDeviceSetup& setup);
 
@@ -65,9 +81,10 @@ private:
     std::chrono::milliseconds timeout_;
 
     // EResult ParseResponse(const std::string& response, ResponseData& responseData);
+    EResult ExtractErrorCode(const std::string& response); 
     EResult ParseResponse(std::string& response);
 
-    EResult HandleComm(const std::string& command, std::string& response);
+    EResult HandleComm(const std::string& command, std::string& response, bool returnRawResponse=false);
 
     EResult ExtractDataString(const std::string& str, const std::string& prefix, 
         const std::string delimiter, std::string& data);

@@ -72,9 +72,9 @@ EResult BU04Handler::GetAt(std::string& response)
 
 
 
-EResult BU04Handler::SaveCfg(std::string& response)
+EResult BU04Handler::Save(std::string& response)
 {
-    std::cout << "SaveCfg() called" << std::endl;
+    std::cout << "Save() called" << std::endl;
 
     EResult result;
     const std::string command = "AT+SAVE\r\n";
@@ -123,9 +123,9 @@ EResult BU04Handler::Restore(std::string& response)
     return EResult::kSuccess;
 }
 
-EResult BU04Handler::GetVersion(std::string& response, std::string& version)
+EResult BU04Handler::GetVer(std::string& response, std::string& version)
 {
-    std::cout << "GetVersion() called" << std::endl;
+    std::cout << "GetVer() called" << std::endl;
 
     EResult result;
     const std::string command = "AT+GETVER\r\n";
@@ -141,6 +141,73 @@ EResult BU04Handler::GetVersion(std::string& response, std::string& version)
     if (ExtractDataString(received, "getver software:", ",", data) == EResult::kSuccess) {
         version = data;
     } else {
+        return EResult::kUnexpectedResponse;
+    }
+
+    return EResult::kSuccess;
+}
+
+EResult BU04Handler::GetWorkMode(std::string& response, int& workMode)
+{
+    std::cout << "GetWorkMode() called" << std::endl;
+
+    EResult result;
+    const std::string command = "AT+GETWORKMODE\r\n";
+    std::string received;
+    result = HandleComm(command, received);
+    response = received;
+
+    if (result != EResult::kSuccess) {
+        return result;
+    }
+
+    std::string data;
+    if (ExtractDataString(received, "workmode:", ",", data) == EResult::kSuccess) {
+        workMode = std::stoi(data);
+    } else {
+        return EResult::kUnexpectedResponse;
+    }
+
+    return EResult::kSuccess;
+}
+
+EResult BU04Handler::GetSensor(std::string& response, SensorData& sensorData)
+{
+    std::cout << "GetSensor() called" << std::endl;
+
+    EResult result;
+    const std::string command = "AT+GETSENSOR\r\n";
+    std::string received;
+    result = HandleComm(command, received);
+    response = received;
+
+    if (result != EResult::kSuccess) {
+        return result;
+    }
+
+    std::string data;
+    try {
+        if (ExtractDataString(received, "accX:", ",", data) == EResult::kSuccess) {
+            sensorData.accX = std::stof(data);
+        } else {
+            return EResult::kUnexpectedResponse;
+        }
+        if (ExtractDataString(received, "accY:", ",", data) == EResult::kSuccess) {
+            sensorData.accY = std::stof(data);
+        } else {
+            return EResult::kUnexpectedResponse;
+        }
+        if (ExtractDataString(received, "accZ:", ",", data) == EResult::kSuccess) {
+            sensorData.accZ = std::stof(data);
+        } else {
+            return EResult::kUnexpectedResponse;
+        }
+        if (ExtractDataString(received, "angle:", ",", data) == EResult::kSuccess) {
+            sensorData.angle = std::stof(data);
+        } else {
+            return EResult::kUnexpectedResponse;
+        }
+    } catch (const std::invalid_argument&) {
         return EResult::kUnexpectedResponse;
     }
 
@@ -244,6 +311,71 @@ EResult BU04Handler::GetDev(std::string &response, TwrDeviceSetup& setup)
     return EResult::kSuccess;
 }
 
+EResult BU04Handler::GetDeca(std::string &response)
+{
+    std::cout << "GetDeca() called" << std::endl;
+
+    EResult result;
+    const std::string command = "AT+DECA$\r\n";
+    std::string received;
+    result = HandleComm(command, received, true);
+    response = received;
+
+    if (result != EResult::kSuccess) {
+        return result;
+    }
+    result = ExtractErrorCode(response);
+
+    return result;
+}
+
+EResult BU04Handler::GetDList(std::string &response)
+{
+    std::cout << "GetDList() called" << std::endl;
+
+    EResult result;
+    const std::string command = "AT+GETDLIST\r\n";
+    std::string received;
+    result = HandleComm(command, received, true);
+    response = received;
+
+    if (result != EResult::kSuccess) {
+        return result;
+    }
+    result = ExtractErrorCode(response);
+
+    return EResult::kSuccess;
+}
+
+EResult BU04Handler::GetKList(std::string &response)
+{
+    std::cout << "GetKList() called" << std::endl;
+
+    EResult result;
+    const std::string command = "AT+GETKLIST\r\n";
+    std::string received;
+    result = HandleComm(command, received, true);
+    response = received;
+
+    if (result != EResult::kSuccess) {
+        return result;
+    }
+    result = ExtractErrorCode(response);
+
+    return EResult::kSuccess;
+}
+
+EResult BU04Handler::ExtractErrorCode(const std::string& response)
+{
+    if (response.find("OK") != std::string::npos) {
+        return EResult::kSuccess;
+    } else if (response.find("ERR") != std::string::npos) {
+        return EResult::kError;
+    } else {
+        return EResult::kUnexpectedResponse;
+    }
+}
+
 EResult BU04Handler::ParseResponse(std::string& response)
 {
     std::cout << "ParseResponse() called" << std::endl;
@@ -252,13 +384,14 @@ EResult BU04Handler::ParseResponse(std::string& response)
     EResult result;
 
     // Extract the response code
-    if (response.find("OK") != std::string::npos) {
-        result = EResult::kSuccess;
-    } else if (response.find("ERR") != std::string::npos) {
-        result = EResult::kError;
-    } else {
-        result = EResult::kUnexpectedResponse;
-    }
+    // if (response.find("OK") != std::string::npos) {
+    //     result = EResult::kSuccess;
+    // } else if (response.find("ERR") != std::string::npos) {
+    //     result = EResult::kError;
+    // } else {
+    //     result = EResult::kUnexpectedResponse;
+    // }
+    result = ExtractErrorCode(response);
     // std::cout << "Response code: " << (result == EResult::kSuccess ? "OK" : "ERR") << std::endl;
 
     // Prune leading special characters
@@ -284,7 +417,7 @@ EResult BU04Handler::ParseResponse(std::string& response)
     return result;
 }
 
-EResult BU04Handler::HandleComm(const std::string &command, std::string &response)
+EResult BU04Handler::HandleComm(const std::string &command, std::string &response, bool returnRawResponse)
 {
     std::cout << "HandleComm() called" << std::endl;
 
@@ -314,6 +447,11 @@ EResult BU04Handler::HandleComm(const std::string &command, std::string &respons
 
     if (bytesRead == 0) {
         return EResult::kTimeout;
+    }
+
+    if (returnRawResponse) {
+        response = received;
+        return EResult::kSuccess;
     }
 
     EResult result;
@@ -370,6 +508,55 @@ EResult BU04Handler::SetCfg(const DeviceConfiguration &deviceConfig)
 
     return EResult::kSuccess;
 }
+
+EResult BU04Handler::TestLed(std::string& response, int state)
+{
+    std::cout << "TestLed() called" << std::endl;
+
+    EResult result;
+    const std::string command = "AT+TESTLED\r\n";
+    std::string received;
+    result = HandleComm(command, received);
+    response = received;
+
+    if (result != EResult::kSuccess) {
+        return result;
+    }
+
+    return EResult::kSuccess;
+}
+
+EResult BU04Handler::TestOled(std::string& response)
+{
+    std::cout << "TestOled() called" << std::endl;
+
+    EResult result;
+    const std::string command = "AT+TESTOLED\r\n";
+    std::string received;
+    result = HandleComm(command, received);
+    response = received;
+
+    if (result != EResult::kSuccess) {
+        return result;
+    }
+
+    return EResult::kSuccess;
+}
+
+EResult BU04Handler::SetWorkMode(int workMode)
+{
+    EResult result;
+    const std::string command = "AT+SETWORKMODE=" + std::to_string(workMode) + "\r\n";
+    std::string received;
+    result = HandleComm(command, received);
+
+    if (result != EResult::kSuccess) {
+        return result;
+    }
+
+    return EResult::kSuccess;
+}
+
 EResult BU04Handler::SetDev(const TwrDeviceSetup &setup)
 {
     const std::string command = "AT+SETDEV=" + std::to_string(setup.tagCapacity) + "," +

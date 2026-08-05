@@ -13,13 +13,13 @@ public:
     virtual ~IUart() = default;
 
     virtual std::size_t read(std::uint8_t* buffer, std::size_t capacity, 
-                             std::chrono::milliseconds firstByteTimeout=std::chrono::milliseconds(500),
-                             std::chrono::milliseconds interByteTimeout=std::chrono::milliseconds(50)) = 0;
+                             std::chrono::milliseconds firstByteTimeout=std::chrono::milliseconds(1000),
+                             std::chrono::milliseconds interByteTimeout=std::chrono::milliseconds(100)) = 0;
     virtual bool write(const std::uint8_t* data, std::size_t size) = 0;
 
     virtual std::size_t readText(std::string& text, std::size_t maxBytes, 
-                                 std::chrono::milliseconds firstByteTimeout=std::chrono::milliseconds(500),
-                                 std::chrono::milliseconds interByteTimeout=std::chrono::milliseconds(50)) {
+                                 std::chrono::milliseconds firstByteTimeout=std::chrono::milliseconds(1000),
+                                 std::chrono::milliseconds interByteTimeout=std::chrono::milliseconds(100)) {
         text.clear();
         text.resize(maxBytes);
 

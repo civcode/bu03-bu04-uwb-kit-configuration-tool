@@ -136,15 +136,24 @@ int main(int argc, char* argv[])
 
     
 
-        // std::string version;
-        // result = handler.GetVersion(response, version);
-        // if (result == BU04Handler::EResult::kSuccess) {
-        //     std::cout << "BU04 Version: " << version << std::endl;
-        // } else {
-        //     std::cerr << "Failed to get BU04 version\n";
-        // }
-        // std::cout << std::endl;
+        std::string version;
+        result = handler.GetVer(response, version);
+        if (result == BU04Handler::EResult::kSuccess) {
+            std::cout << "BU04 Version: " << version << std::endl;
+        } else {
+            std::cerr << "Failed to get BU04 version\n";
+        }
+        std::cout << std::endl;
         // std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+        int workMode;
+        result = handler.GetWorkMode(response, workMode);
+        if (result == BU04Handler::EResult::kSuccess) {
+            std::cout << "BU04 Work Mode: " << workMode << std::endl;
+        } else {
+            std::cerr << "Failed to get BU04 work mode\n";
+        }
+        std::cout << std::endl;
 
         std::string devCfg;
         BU04Handler::DeviceConfiguration deviceConfig;
@@ -201,17 +210,53 @@ int main(int argc, char* argv[])
         std::cout << std::endl;
         // }
 
-        deviceConfig.id = 1;
-        deviceConfig.role = 0;
-        deviceConfig.channel = 0;
-        deviceConfig.rate = 1;
-        const auto setCfgResult = handler.SetCfg(deviceConfig);
-        if (setCfgResult == BU04Handler::EResult::kSuccess) {
-            std::cout << "Successfully set BU04 device configuration\n";
+        result = handler.GetDeca(response);
+        if (result == BU04Handler::EResult::kSuccess) {
+            std::cout << "BU04 Deca Response: " << response << std::endl;
         } else {
-            std::cerr << "Failed to set BU04 device configuration\n";
+            std::cerr << "Failed to get BU04 deca response\n";
         }
         std::cout << std::endl;
+
+        result = handler.GetDList(response);
+        if (result == BU04Handler::EResult::kSuccess) {
+            // std::cout << "BU04 DList Response: " << response << std::endl;
+            handler.PrintAllChar(response);
+        } else {
+            std::cerr << "Failed to get BU04 dlist response\n";
+        }
+        std::cout << std::endl;
+
+        result = handler.GetKList(response);
+        if (result == BU04Handler::EResult::kSuccess) {
+            // std::cout << "BU04 KList Response: " << response << std::endl;
+            handler.PrintAllChar(response);
+        } else {
+            std::cerr << "Failed to get BU04 klist response\n";
+        }
+        std::cout << std::endl;
+
+        return 0;
+
+        // deviceConfig.id = 1;
+        // deviceConfig.role = 0;
+        // deviceConfig.channel = 0;
+        // deviceConfig.rate = 1;
+        // const auto setCfgResult = handler.SetCfg(deviceConfig);
+        // if (setCfgResult == BU04Handler::EResult::kSuccess) {
+        //     std::cout << "Successfully set BU04 device configuration\n";
+        // } else {
+        //     std::cerr << "Failed to set BU04 device configuration\n";
+        // }
+        // std::cout << std::endl;
+
+
+        // result = handler.Save(response);
+        // if (result == BU04Handler::EResult::kSuccess) {
+        //     std::cout << "BU04 Save Response: " << response << std::endl;
+        // } else {
+        //     std::cerr << "Failed to save BU04 configuration\n";
+        // }
 
         float distance;
         std::string distanceInfo;
@@ -231,6 +276,14 @@ int main(int argc, char* argv[])
             std::cout << "BU04 Restart Response: " << response << std::endl;
         } else {
             std::cerr << "Failed to restart BU04\n";
+        }
+        std::cout << std::endl;
+
+        result = handler.TestLed(response, 1);
+        if (result == BU04Handler::EResult::kSuccess) {
+            std::cout << "BU04 Test LED Response: " << response << std::endl;
+        } else {
+            std::cerr << "Failed to test BU04 LED\n";
         }
         std::cout << std::endl;
 
