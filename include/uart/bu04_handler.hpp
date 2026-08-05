@@ -15,16 +15,6 @@ public:
         kError
     };
 
-    // enum class EResponseCode {
-    //     kSuccess,
-    //     kError
-    // };
-
-    // typedef struct ResponseData_ {
-    //     std::string str;
-    //     EResponseCode code;
-    // } ResponseData;
-
     typedef struct DeviceConfiguration_ {
         int id;
         int role;
@@ -48,8 +38,11 @@ public:
         : uart_(uart), timeout_(timeout), timePrevTx_(std::chrono::high_resolution_clock::now()) {}
 
     // void handleData(const char* data);
-
     EResult SaveCfg(std::string& response);
+    EResult Restart(std::string& response);
+    EResult Restore(std::string& response);
+
+    EResult GetAt(std::string& response);
     EResult GetVersion(std::string& response, std::string& version);
     EResult GetCfg(std::string& response, DeviceConfiguration& deviceConfig);
     EResult GetDistance(std::string& response, float& distance);
@@ -64,7 +57,6 @@ public:
 
 private:
     constexpr static std::size_t kMaxResponseSize = 1024;
-    // constexpr static std::chrono::milliseconds kUartTxInterval = std::chrono::milliseconds(500);
     constexpr static std::chrono::milliseconds kUartWaitTime = std::chrono::milliseconds(100);
 
     std::chrono::high_resolution_clock::time_point timePrevTx_;

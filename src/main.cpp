@@ -123,20 +123,32 @@ int main(int argc, char* argv[])
 
         BU04Handler handler(uart);
 
+        BU04Handler::EResult result;
         std::string response;
-        std::string version;
-        const auto result = handler.GetVersion(response, version);
-        if (result == BU04Handler::EResult::kSuccess) {
-            std::cout << "BU04 Version: " << version << std::endl;
-        } else {
-            std::cerr << "Failed to get BU04 version\n";
-        }
-        std::cout << std::endl;
+
+        // result = handler.GetAt(response);
+        // if (result == BU04Handler::EResult::kSuccess) {
+        //     std::cout << "BU04 AT Response: " << response << std::endl;
+        // } else {
+        //     std::cerr << "Failed to get BU04 AT response\n";
+        // }
+        // std::cout << std::endl;
+
+    
+
+        // std::string version;
+        // result = handler.GetVersion(response, version);
+        // if (result == BU04Handler::EResult::kSuccess) {
+        //     std::cout << "BU04 Version: " << version << std::endl;
+        // } else {
+        //     std::cerr << "Failed to get BU04 version\n";
+        // }
+        // std::cout << std::endl;
         // std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
         std::string devCfg;
         BU04Handler::DeviceConfiguration deviceConfig;
-        while (!stop_requested.test()) {
+        // while (!stop_requested.test()) {
         const auto cfgResult = handler.GetCfg(devCfg, deviceConfig);
         if (cfgResult == BU04Handler::EResult::kSuccess) {
             std::cout << "BU04 Device Configuration: " << devCfg << std::endl;
@@ -149,12 +161,28 @@ int main(int argc, char* argv[])
         }
         std::cout << std::endl;
         // std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        }
-        return 0;
+        // }
+        // result = handler.Restart(response);
+        // if (result == BU04Handler::EResult::kSuccess) {
+        //     std::cout << "BU04 Restart Response: " << response << std::endl;
+        // } else {
+        //     std::cerr << "Failed to restart BU04\n";
+        // }
+        // std::cout << std::endl;
+        
+        // result = handler.Restore(response);
+        // if (result == BU04Handler::EResult::kSuccess) {
+        //     std::cout << "BU04 Restore Response: " << response << std::endl;
+        // } else {
+        //     std::cerr << "Failed to restore BU04\n";
+        // }
+        // std::cout << std::endl;
+        // return 0;
 
         
         std::string devInfo;
         BU04Handler::TwrDeviceSetup setup;
+        // while (!stop_requested.test()) {
         const auto devResult = handler.GetDev(devInfo, setup);
         if (devResult == BU04Handler::EResult::kSuccess) {
             std::cout << "BU04 Device Info: " << devInfo << std::endl;
@@ -171,6 +199,7 @@ int main(int argc, char* argv[])
             std::cerr << "Failed to get BU04 device info\n";
         }
         std::cout << std::endl;
+        // }
 
         deviceConfig.id = 1;
         deviceConfig.role = 0;
@@ -186,6 +215,7 @@ int main(int argc, char* argv[])
 
         float distance;
         std::string distanceInfo;
+        // while (!stop_requested.test()) {
         const auto distanceResult = handler.GetDistance(distanceInfo, distance);
         if (distanceResult == BU04Handler::EResult::kSuccess) {
             std::cout << "BU04 Distance Info: " << distanceInfo << std::endl;
@@ -194,35 +224,18 @@ int main(int argc, char* argv[])
             std::cerr << "Failed to get BU04 distance info\n";
         }
         std::cout << std::endl;
+        // }
+
+        result = handler.Restart(response);
+        if (result == BU04Handler::EResult::kSuccess) {
+            std::cout << "BU04 Restart Response: " << response << std::endl;
+        } else {
+            std::cerr << "Failed to restart BU04\n";
+        }
+        std::cout << std::endl;
 
         return 0;
-        // return 0;
-        setup.tagCapacity = 2;
-        handler.SetDev(setup);
 
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-
-
-
-        // uart.writeAll("Hello from Linux C++!\r\n");
-        // uart.writeAll("AT\r\n");
-
-        // const std::string received = uart.readSome();
-        // if (!received.empty()) {
-        //     std::cout << "Received " << received.size()
-        //               << " bytes: " << received << std::flush;
-        // }
-
-        // while (!stop_requested.test()) {
-        //     const std::string received = uart.readSome();
-
-        //     if (!received.empty()) {
-        //         std::cout << "Received " << received.size()
-        //                   << " bytes: " << received << std::flush;
-        //     } else {
-        //         std::cout << "Read timeout\n";
-        //     }
-        // }
     } catch (const std::exception& error) {
         std::cerr << "Error: " << error.what() << '\n';
         return 1;

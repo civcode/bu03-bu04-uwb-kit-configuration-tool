@@ -52,6 +52,26 @@ EResult BU04Handler::GetCfg(std::string & response, DeviceConfiguration& deviceC
     return EResult::kSuccess;
 }
 
+EResult BU04Handler::GetAt(std::string& response)
+{
+    std::cout << "GetAt() called" << std::endl;
+
+    EResult result;
+    const std::string command = "AT\r\n";
+    std::string received;
+    result = HandleComm(command, received);
+    response = received;
+
+    if (result != EResult::kSuccess) {
+        return result;
+    }
+
+    return EResult::kSuccess;
+}
+
+
+
+
 EResult BU04Handler::SaveCfg(std::string& response)
 {
     std::cout << "SaveCfg() called" << std::endl;
@@ -62,6 +82,40 @@ EResult BU04Handler::SaveCfg(std::string& response)
     result = HandleComm(command, received);
     response = received;
    
+    if (result != EResult::kSuccess) {
+        return result;
+    }
+
+    return EResult::kSuccess;
+}
+
+EResult BU04Handler::Restart(std::string& response)
+{
+    std::cout << "Restart() called" << std::endl;
+
+    EResult result;
+    const std::string command = "AT+RESTART\r\n";
+    std::string received;
+    result = HandleComm(command, received);
+    response = received;
+
+    if (result != EResult::kSuccess) {
+        return result;
+    }
+
+    return EResult::kSuccess;
+}
+
+EResult BU04Handler::Restore(std::string& response)
+{
+    std::cout << "Restore() called" << std::endl;
+
+    EResult result;
+    const std::string command = "AT+RESTORE\r\n";
+    std::string received;
+    result = HandleComm(command, received);
+    response = received;
+
     if (result != EResult::kSuccess) {
         return result;
     }
