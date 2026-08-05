@@ -259,7 +259,7 @@ EResult BU04Handler::GetDev(std::string &response, TwrDeviceSetup& setup)
     std::string data;
 
     try {
-        if (ExtractDataString(received, "getdev cap:", " ", data) == EResult::kSuccess) {
+        if (ExtractDataString(received, "cap:", " ", data) == EResult::kSuccess) {
             setup.tagCapacity = std::stoi(data);
         } else {
             return EResult::kUnexpectedResponse;
@@ -569,6 +569,8 @@ EResult BU04Handler::TestOled(std::string& response)
 
 EResult BU04Handler::SetWorkMode(int workMode)
 {
+    std::cout << "SetWorkMode() called" << std::endl;
+
     EResult result;
     const std::string command = "AT+SETWORKMODE=" + std::to_string(workMode) + "\r\n";
     std::string received;
@@ -583,6 +585,8 @@ EResult BU04Handler::SetWorkMode(int workMode)
 
 EResult BU04Handler::SetDev(const TwrDeviceSetup &setup)
 {
+    std::cout << "SetDev() called" << std::endl;
+
     const std::string command = "AT+SETDEV=" + std::to_string(setup.tagCapacity) + "," +
                                 std::to_string(setup.antennaDelay) + "," +
                                 std::to_string(setup.isKalmanFilterEnabled ? 1 : 0) + "," +
@@ -593,7 +597,7 @@ EResult BU04Handler::SetDev(const TwrDeviceSetup &setup)
                                 std::to_string(setup.isPositioningEnabled ? 1 : 0) + "," +
                                 std::to_string(setup.positioningDimension) + "\r\n";
 
-    std::cout << "Sending command: " << command << std::endl;
+    // std::cout << "Sending command: " << command << std::endl;
     // return EResult::kSuccess;
 
     uart_.writeText(command);
@@ -601,19 +605,24 @@ EResult BU04Handler::SetDev(const TwrDeviceSetup &setup)
     const std::size_t bytesRead = uart_.readText(received, kMaxResponseSize, timeout_);
     // RemoveTerminator(received);
     // PrintHex(received);
-    PrintAllChar(received);
+    // PrintAllChar(received);
     // std::cout << received << std::flush;
-    std::cout << "Received response: " << received << std::endl;
+    // std::cout << "Received response: " << received << std::endl;
 
     if (bytesRead == 0) {
         return EResult::kTimeout;
     }
 
-    return EResult();
+    EResult result;
+    result = ParseResponse(received);
+
+    return result;
 }
 
 EResult BU04Handler::SetUwbMode(int uwbMode)
 {
+    std::cout << "SetUwbMode() called" << std::endl;
+    
     EResult result;
     const std::string command = "AT+SETUWBMODE=" + std::to_string(uwbMode) + "\r\n";
     std::string received;

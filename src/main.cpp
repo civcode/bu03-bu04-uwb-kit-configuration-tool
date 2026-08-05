@@ -192,8 +192,8 @@ int main(int argc, char* argv[])
         std::string devInfo;
         BU04Handler::TwrDeviceSetup setup;
         // while (!stop_requested.test()) {
-        const auto devResult = handler.GetDev(devInfo, setup);
-        if (devResult == BU04Handler::EResult::kSuccess) {
+        result = handler.GetDev(devInfo, setup);
+        if (result == BU04Handler::EResult::kSuccess) {
             std::cout << "BU04 Device Info: " << devInfo << std::endl;
             std::cout << "Tag Capacity: " << setup.tagCapacity << std::endl;
             std::cout << "Antenna Delay: " << setup.antennaDelay << std::endl;
@@ -209,6 +209,15 @@ int main(int argc, char* argv[])
         }
         std::cout << std::endl;
         // }
+
+        setup.tagCapacity = 2;
+        result = handler.SetDev(setup);
+        if (result == BU04Handler::EResult::kSuccess) {
+            std::cout << "Successfully set BU04 device info\n";
+        } else {
+            std::cerr << "Failed to set BU04 device info\n";
+        }
+        std::cout << std::endl;
 
         result = handler.GetDeca(response);
         if (result == BU04Handler::EResult::kSuccess) {
