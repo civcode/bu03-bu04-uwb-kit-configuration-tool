@@ -135,6 +135,7 @@ int main(int argc, char* argv[])
 
         std::string devCfg;
         BU04Handler::DeviceConfiguration deviceConfig;
+        // while (!stop_requested.test()) {
         const auto cfgResult = handler.GetCfg(devCfg, deviceConfig);
         if (cfgResult == BU04Handler::EResult::kSuccess) {
             std::cout << "BU04 Device Configuration: " << devCfg << std::endl;
@@ -146,6 +147,9 @@ int main(int argc, char* argv[])
             std::cerr << "Failed to get BU04 device configuration\n";
         }
         std::cout << std::endl;
+        // std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        // }
+        // return 0;
 
         
         std::string devInfo;

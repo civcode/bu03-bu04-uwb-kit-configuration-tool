@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <string>
 #include <stdexcept>
+#include <thread>
 
 using EResult = BU04Handler::EResult;
 
@@ -192,7 +193,7 @@ EResult BU04Handler::GetDev(std::string &response, TwrDeviceSetup& setup)
 EResult BU04Handler::ParseResponse(std::string& response)
 {
     std::cout << "ParseResponse() called" << std::endl;
-    PrintAllChar(response);
+    // PrintAllChar(response);
 
     EResult result;
 
@@ -204,7 +205,6 @@ EResult BU04Handler::ParseResponse(std::string& response)
     } else {
         result = EResult::kUnexpectedResponse;
     }
-    // PrintAllChar(response);
     // std::cout << "Response code: " << (result == EResult::kSuccess ? "OK" : "ERR") << std::endl;
 
     // Prune leading special characters
@@ -223,6 +223,7 @@ EResult BU04Handler::ParseResponse(std::string& response)
     // std::cout << (result == EResult::kSuccess ? "OK" : "ERR") << std::endl;
     // std::cout << std::endl; 
 
+    std::cout << "Response string: ";
     PrintAllChar(response);
     std::cout << "Response code: " << (result == EResult::kSuccess ? "OK" : "ERR") << std::endl;
 
@@ -234,8 +235,10 @@ EResult BU04Handler::HandleComm(const std::string &command, std::string &respons
     std::cout << "HandleComm() called" << std::endl;
 
     // Purge uart buffers
-    std::string dump;
-    uart_.readText(dump, 256, timeout_); // Purge uart buffers
+    // uart_.writeText("AT\r\n");
+    // std::string dump;
+    // uart_.readText(dump, 256, std::chrono::milliseconds(100)); 
+    // std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
 
     PrintAllChar(command);
