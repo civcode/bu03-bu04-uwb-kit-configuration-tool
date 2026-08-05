@@ -240,12 +240,22 @@ EResult BU04Handler::HandleComm(const std::string &command, std::string &respons
     // uart_.readText(dump, 256, std::chrono::milliseconds(100)); 
     // std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
+    // Wait if the previous command was sent too recently
+    const auto now = std::chrono::high_resolution_clock::now();
+    const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - timePrevTx_);
+    if (elapsed < std::chrono::milliseconds(kUartWaitTime)) {
+        std::cout << "Waiting for UART" << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(kUartWaitTime));
+    }
+    timePrevTx_ = std::chrono::high_resolution_clock::now();
+
 
     PrintAllChar(command);
     uart_.writeText(command);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     std::string received;
-    const std::size_t bytesRead = uart_.readText(received, 256, timeout_);
+    const std::size_t bytesRead = uart_.readText(received, kMaxResponseSize, timeout_);
     // PrintAllChar(received);
 
     if (bytesRead == 0) {
@@ -323,7 +333,7 @@ EResult BU04Handler::SetDev(const TwrDeviceSetup &setup)
 
     uart_.writeText(command);
     std::string received;
-    const std::size_t bytesRead = uart_.readText(received, 256, timeout_);
+    const std::size_t bytesRead = uart_.readText(received, kMaxResponseSize, timeout_);
     // RemoveTerminator(received);
     // PrintHex(received);
     PrintAllChar(received);

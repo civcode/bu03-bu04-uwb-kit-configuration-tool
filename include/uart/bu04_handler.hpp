@@ -45,7 +45,7 @@ public:
     } TwrDeviceSetup;
 
     explicit BU04Handler(IUart& uart, std::chrono::milliseconds timeout = std::chrono::milliseconds(1000))
-        : uart_(uart), timeout_(timeout) {}
+        : uart_(uart), timeout_(timeout), timePrevTx_(std::chrono::high_resolution_clock::now()) {}
 
     // void handleData(const char* data);
 
@@ -63,6 +63,12 @@ public:
     void PrintAllChar(const std::string_view text);
 
 private:
+    constexpr static std::size_t kMaxResponseSize = 1024;
+    // constexpr static std::chrono::milliseconds kUartTxInterval = std::chrono::milliseconds(500);
+    constexpr static std::chrono::milliseconds kUartWaitTime = std::chrono::milliseconds(100);
+
+    std::chrono::high_resolution_clock::time_point timePrevTx_;
+
     IUart& uart_;
     std::chrono::milliseconds timeout_;
 
