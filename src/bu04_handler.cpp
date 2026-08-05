@@ -232,6 +232,12 @@ EResult BU04Handler::ParseResponse(std::string& response)
 EResult BU04Handler::HandleComm(const std::string &command, std::string &response)
 {
     std::cout << "HandleComm() called" << std::endl;
+
+    // Purge uart buffers
+    std::string dump;
+    uart_.readText(dump, 256, timeout_); // Purge uart buffers
+
+
     PrintAllChar(command);
     uart_.writeText(command);
 
