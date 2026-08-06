@@ -302,6 +302,20 @@ int main(int argc, char* argv[])
         }
         std::cout << std::endl;
 
+        // BU04Handler::TagParameters tagParams{
+        //     .a64 = "000000004E818834",
+        //     .a16 = 8834,
+        //     .F = 1,
+        //     .S = 64,
+        //     .M = 0
+        // };
+        // result = handler.AddTag(response, tagParams);
+        // if (result == BU04Handler::EResult::kSuccess) {
+        //     std::cout << "Successfully added BU04 tag\n";
+        // } else {
+        //     std::cerr << "Failed to add BU04 tag\n";
+        // }
+        // std::cout << std::endl;
 
         return 0;
 

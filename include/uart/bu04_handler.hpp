@@ -15,21 +15,21 @@ public:
         kError
     };
 
-    typedef struct DeviceConfiguration_ {
+    struct DeviceConfiguration {
         int id;
         int role;
         int channel;
         int rate;
-    } DeviceConfiguration;
+    };
 
-    typedef struct SensorData_ {
+    struct SensorData {
         float accX;
         float accY;
         float accZ;
         float angle;
-    } SensorData;
+    };
 
-    typedef struct TwrDeviceSetup_ {
+    struct TwrDeviceSetup {
         int tagCapacity;
         int antennaDelay;
         bool isKalmanFilterEnabled;
@@ -39,9 +39,9 @@ public:
         float correctionParameterB;
         bool isPositioningEnabled;
         int positioningDimension;
-    } TwrDeviceSetup;
+    };
 
-    typedef struct PdoaConfiguration_ {
+    struct PdoaConfiguration {
         int dlist;
         int klist;
         int net;
@@ -51,7 +51,15 @@ public:
         int userCmd;
         int pdoaOffset;
         int rngOffset;
-    } PdoaConfiguration;
+    };
+
+    struct TagParameters {
+        std::string a64;
+        int a16;
+        int F;
+        int S;
+        int M;
+    };
 
     explicit BU04Handler(IUart& uart, std::chrono::milliseconds timeout = std::chrono::milliseconds(1000))
         : uart_(uart), timeout_(timeout), timePrevTx_(std::chrono::high_resolution_clock::now()) {}
@@ -73,6 +81,9 @@ public:
     EResult GetKList(std::string& response);
     EResult GetPdoaCfg(std::string& response, PdoaConfiguration& pdoaCfg);
     EResult GetUwbMode(std::string& response, int& uwbMode);
+
+    EResult AddTag(std::string& response, const TagParameters& tagParams);
+    EResult DelTag(std::string& response, const std::string& a64);
 
     EResult TestLed(std::string& response, int state);
     EResult TestOled(std::string& response);

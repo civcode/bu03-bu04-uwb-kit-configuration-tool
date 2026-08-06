@@ -602,6 +602,45 @@ EResult BU04Handler::SetCfg(const DeviceConfiguration &deviceConfig)
     return EResult::kSuccess;
 }
 
+EResult BU04Handler::AddTag(std::string& response, const TagParameters& tagParams)
+{
+    std::cout << "AddTag() called" << std::endl;
+
+    EResult result;
+    const std::string command = "AT+ADDTAG=" + tagParams.a64 + "," +
+                                std::to_string(tagParams.a16) + "," +
+                                std::to_string(tagParams.F) + "," +
+                                std::to_string(tagParams.S) + "," +
+                                std::to_string(tagParams.M) + "\r\n";
+    std::string received;
+    result = HandleComm(command, received);
+    response = received;
+
+    if (result != EResult::kSuccess) {
+        return result;
+    }
+
+    return EResult::kSuccess;
+}
+
+EResult BU04Handler::DelTag(std::string& response, const std::string& a64)
+{
+    std::cout << "DelTag() called" << std::endl;
+
+    EResult result;
+    const std::string command = "AT+DELTAG=" + a64 + "\r\n";
+    std::string received;
+    result = HandleComm(command, received);
+    response = received;
+
+    if (result != EResult::kSuccess) {
+        return result;
+    }
+
+    return EResult::kSuccess;
+}
+
+
 EResult BU04Handler::TestLed(std::string& response, int state)
 {
     std::cout << "TestLed() called" << std::endl;
