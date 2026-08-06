@@ -1,4 +1,4 @@
-#include "uart/bu04_handler.hpp"
+#include "protocol/device_handler.hpp"
 
 #include <iostream>
 #include <iomanip>
@@ -6,9 +6,9 @@
 #include <stdexcept>
 #include <thread>
 
-using EResult = BU04Handler::EResult;
+using EResult = DeviceHandler::EResult;
 
-EResult BU04Handler::GetCfg(std::string & response, DeviceConfiguration& deviceConfig) 
+EResult DeviceHandler::GetCfg(std::string & response, DeviceParameters& deviceConfig) 
 {
     std::cout << "GetCfg() called" << std::endl;
     
@@ -52,7 +52,7 @@ EResult BU04Handler::GetCfg(std::string & response, DeviceConfiguration& deviceC
     return EResult::kSuccess;
 }
 
-EResult BU04Handler::GetAt(std::string& response)
+EResult DeviceHandler::GetAt(std::string& response)
 {
     std::cout << "GetAt() called" << std::endl;
 
@@ -72,7 +72,7 @@ EResult BU04Handler::GetAt(std::string& response)
 
 
 
-EResult BU04Handler::Save(std::string& response)
+EResult DeviceHandler::Save(std::string& response)
 {
     std::cout << "Save() called" << std::endl;
 
@@ -89,7 +89,7 @@ EResult BU04Handler::Save(std::string& response)
     return EResult::kSuccess;
 }
 
-EResult BU04Handler::Restart(std::string& response)
+EResult DeviceHandler::Restart(std::string& response)
 {
     std::cout << "Restart() called" << std::endl;
 
@@ -106,7 +106,7 @@ EResult BU04Handler::Restart(std::string& response)
     return EResult::kSuccess;
 }
 
-EResult BU04Handler::Restore(std::string& response)
+EResult DeviceHandler::Restore(std::string& response)
 {
     std::cout << "Restore() called" << std::endl;
 
@@ -123,7 +123,7 @@ EResult BU04Handler::Restore(std::string& response)
     return EResult::kSuccess;
 }
 
-EResult BU04Handler::GetVer(std::string& response, std::string& version)
+EResult DeviceHandler::GetVer(std::string& response, std::string& version)
 {
     std::cout << "GetVer() called" << std::endl;
 
@@ -147,7 +147,7 @@ EResult BU04Handler::GetVer(std::string& response, std::string& version)
     return EResult::kSuccess;
 }
 
-EResult BU04Handler::GetWorkMode(std::string& response, int& workMode)
+EResult DeviceHandler::GetWorkMode(std::string& response, int& workMode)
 {
     std::cout << "GetWorkMode() called" << std::endl;
 
@@ -171,7 +171,7 @@ EResult BU04Handler::GetWorkMode(std::string& response, int& workMode)
     return EResult::kSuccess;
 }
 
-EResult BU04Handler::GetSensor(std::string& response, SensorData& sensorData)
+EResult DeviceHandler::GetSensor(std::string& response, SensorData& sensorData)
 {
     std::cout << "GetSensor() called" << std::endl;
 
@@ -214,7 +214,7 @@ EResult BU04Handler::GetSensor(std::string& response, SensorData& sensorData)
     return EResult::kSuccess;
 }
 
-EResult BU04Handler::GetDistance(std::string &response, float &distance)
+EResult DeviceHandler::GetDistance(std::string &response, float &distance)
 {
     std::cout << "GetDistance() called" << std::endl;
 
@@ -243,7 +243,7 @@ EResult BU04Handler::GetDistance(std::string &response, float &distance)
     return EResult::kSuccess;
 }
 
-EResult BU04Handler::GetDev(std::string &response, TwrDeviceSetup& setup)
+EResult DeviceHandler::GetDev(std::string &response, GetDevParam& setup)
 {
     std::cout << "GetDev() called" << std::endl;
 
@@ -311,7 +311,7 @@ EResult BU04Handler::GetDev(std::string &response, TwrDeviceSetup& setup)
     return EResult::kSuccess;
 }
 
-EResult BU04Handler::GetDeca(std::string &response)
+EResult DeviceHandler::GetDeca(std::string &response)
 {
     std::cout << "GetDeca() called" << std::endl;
 
@@ -329,7 +329,7 @@ EResult BU04Handler::GetDeca(std::string &response)
     return result;
 }
 
-EResult BU04Handler::GetDList(std::string &response)
+EResult DeviceHandler::GetDList(std::string &response)
 {
     std::cout << "GetDList() called" << std::endl;
 
@@ -347,7 +347,7 @@ EResult BU04Handler::GetDList(std::string &response)
     return EResult::kSuccess;
 }
 
-EResult BU04Handler::GetKList(std::string &response)
+EResult DeviceHandler::GetKList(std::string &response)
 {
     std::cout << "GetKList() called" << std::endl;
 
@@ -365,7 +365,7 @@ EResult BU04Handler::GetKList(std::string &response)
     return EResult::kSuccess;
 }
 
-EResult BU04Handler::GetPdoaCfg(std::string &response, PdoaConfiguration &pdoaCfg)
+EResult DeviceHandler::GetPdoaCfg(std::string &response, PdoaGetCfgParam &pdoaCfg)
 {
     std::cout << "GetPdoaCfg() called" << std::endl;
 
@@ -434,7 +434,7 @@ EResult BU04Handler::GetPdoaCfg(std::string &response, PdoaConfiguration &pdoaCf
     return EResult::kSuccess;
 }
 
-EResult BU04Handler::GetUwbMode(std::string &response, int &uwbMode)
+EResult DeviceHandler::GetUwbMode(std::string &response, int &uwbMode)
 {
     std::cout << "GetUwbMode() called" << std::endl;
 
@@ -458,7 +458,7 @@ EResult BU04Handler::GetUwbMode(std::string &response, int &uwbMode)
     return EResult::kSuccess;
 }
 
-EResult BU04Handler::ExtractErrorCode(const std::string& response)
+EResult DeviceHandler::ExtractErrorCode(const std::string& response)
 {
     if (response.find("OK") != std::string::npos) {
         return EResult::kSuccess;
@@ -469,7 +469,7 @@ EResult BU04Handler::ExtractErrorCode(const std::string& response)
     }
 }
 
-EResult BU04Handler::ParseResponse(std::string& response)
+EResult DeviceHandler::ParseResponse(std::string& response)
 {
     std::cout << "ParseResponse() called" << std::endl;
     // PrintAllChar(response);
@@ -510,7 +510,7 @@ EResult BU04Handler::ParseResponse(std::string& response)
     return result;
 }
 
-EResult BU04Handler::HandleComm(const std::string &command, std::string &response, bool returnRawResponse)
+EResult DeviceHandler::HandleComm(const std::string &command, std::string &response, bool returnRawResponse)
 {
     std::cout << "HandleComm() called" << std::endl;
 
@@ -559,7 +559,7 @@ EResult BU04Handler::HandleComm(const std::string &command, std::string &respons
     return EResult::kSuccess;
 }
 
-EResult BU04Handler::ExtractDataString(const std::string &str, const std::string &prefix,
+EResult DeviceHandler::ExtractDataString(const std::string &str, const std::string &prefix,
                                        const std::string delimiter, std::string &data)
 {
     const auto pos = str.find(prefix);
@@ -574,7 +574,7 @@ EResult BU04Handler::ExtractDataString(const std::string &str, const std::string
     return EResult::kUnexpectedResponse;
 }
 
-EResult BU04Handler::SetCfg(const DeviceConfiguration &deviceConfig)
+EResult DeviceHandler::SetCfg(const DeviceParameters &deviceConfig)
 {
     // uart_.writeText(command);
 
@@ -602,7 +602,7 @@ EResult BU04Handler::SetCfg(const DeviceConfiguration &deviceConfig)
     return EResult::kSuccess;
 }
 
-EResult BU04Handler::AddTag(std::string& response, const TagParameters& tagParams)
+EResult DeviceHandler::AddTag(std::string& response, const TagParameters& tagParams)
 {
     std::cout << "AddTag() called" << std::endl;
 
@@ -623,7 +623,7 @@ EResult BU04Handler::AddTag(std::string& response, const TagParameters& tagParam
     return EResult::kSuccess;
 }
 
-EResult BU04Handler::DelTag(std::string& response, const std::string& a64)
+EResult DeviceHandler::DelTag(std::string& response, const std::string& a64)
 {
     std::cout << "DelTag() called" << std::endl;
 
@@ -641,7 +641,7 @@ EResult BU04Handler::DelTag(std::string& response, const std::string& a64)
 }
 
 
-EResult BU04Handler::TestLed(std::string& response, int state)
+EResult DeviceHandler::TestLed(std::string& response, int state)
 {
     std::cout << "TestLed() called" << std::endl;
 
@@ -658,7 +658,7 @@ EResult BU04Handler::TestLed(std::string& response, int state)
     return EResult::kSuccess;
 }
 
-EResult BU04Handler::TestOled(std::string& response)
+EResult DeviceHandler::TestOled(std::string& response)
 {
     std::cout << "TestOled() called" << std::endl;
 
@@ -675,7 +675,7 @@ EResult BU04Handler::TestOled(std::string& response)
     return EResult::kSuccess;
 }
 
-EResult BU04Handler::SetWorkMode(int workMode)
+EResult DeviceHandler::SetWorkMode(int workMode)
 {
     std::cout << "SetWorkMode() called" << std::endl;
 
@@ -691,7 +691,7 @@ EResult BU04Handler::SetWorkMode(int workMode)
     return EResult::kSuccess;
 }
 
-EResult BU04Handler::SetDev(const TwrDeviceSetup &setup)
+EResult DeviceHandler::SetDev(const GetDevParam &setup)
 {
     std::cout << "SetDev() called" << std::endl;
 
@@ -727,7 +727,7 @@ EResult BU04Handler::SetDev(const TwrDeviceSetup &setup)
     return result;
 }
 
-EResult BU04Handler::SetPdoaOffset(int offset)
+EResult DeviceHandler::SetPdoaOffset(int offset)
 {
     std::cout << "SetPdoaOffset() called" << std::endl;
 
@@ -743,7 +743,7 @@ EResult BU04Handler::SetPdoaOffset(int offset)
     return EResult::kSuccess;
 }
 
-EResult BU04Handler::SetRngOffset(int offset)
+EResult DeviceHandler::SetRngOffset(int offset)
 {
     std::cout << "SetRngOffset() called" << std::endl;
 
@@ -759,7 +759,7 @@ EResult BU04Handler::SetRngOffset(int offset)
     return EResult::kSuccess;
 }
 
-EResult BU04Handler::SetUwbMode(int uwbMode)
+EResult DeviceHandler::SetUwbMode(int uwbMode)
 {
     std::cout << "SetUwbMode() called" << std::endl;
 
@@ -775,14 +775,14 @@ EResult BU04Handler::SetUwbMode(int uwbMode)
     return EResult::kSuccess;
 }
 
-void BU04Handler::PrintHex(const std::string &str)
+void DeviceHandler::PrintHex(const std::string &str)
 {
     for (const unsigned char c : str) {
         std::cout << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(c) << " ";
     }
     std::cout << std::dec << std::endl;
 }
-void BU04Handler::PrintAllChar(const std::string_view text)
+void DeviceHandler::PrintAllChar(const std::string_view text)
 {
         for (const unsigned char ch : text) {
         switch (ch) {

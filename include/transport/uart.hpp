@@ -15,7 +15,7 @@
 #include <span>
 #include <vector>
 
-#include "uart/iuart.hpp"
+#include "transport/iuart.hpp"
 
 class Uart final : public IUart {
 public:

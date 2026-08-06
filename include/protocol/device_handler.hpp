@@ -1,11 +1,12 @@
 #ifndef BU04_HANDLER_HPP_
 #define BU04_HANDLER_HPP_
 
-#include "uart/iuart.hpp"
+#include "transport/iuart.hpp"
+#include "configuration/device_configuration.hpp"
 
 #include <string_view>
 
-class BU04Handler {
+class DeviceHandler {
 public:
     enum class EResult {
         kSuccess,
@@ -15,53 +16,53 @@ public:
         kError
     };
 
-    struct DeviceConfiguration {
-        int id;
-        int role;
-        int channel;
-        int rate;
-    };
+    // struct DeviceParameters {
+    //     int id;
+    //     int role;
+    //     int channel;
+    //     int rate;
+    // };
 
-    struct SensorData {
-        float accX;
-        float accY;
-        float accZ;
-        float angle;
-    };
+    // struct SensorData {
+    //     float accX;
+    //     float accY;
+    //     float accZ;
+    //     float angle;
+    // };
 
-    struct TwrDeviceSetup {
-        int tagCapacity;
-        int antennaDelay;
-        bool isKalmanFilterEnabled;
-        float kalmanQ;
-        float kalmanR;
-        float correctionParameterA;
-        float correctionParameterB;
-        bool isPositioningEnabled;
-        int positioningDimension;
-    };
+    // struct TwrDeviceSetup {
+    //     int tagCapacity;
+    //     int antennaDelay;
+    //     bool isKalmanFilterEnabled;
+    //     float kalmanQ;
+    //     float kalmanR;
+    //     float correctionParameterA;
+    //     float correctionParameterB;
+    //     bool isPositioningEnabled;
+    //     int positioningDimension;
+    // };
 
-    struct PdoaConfiguration {
-        int dlist;
-        int klist;
-        int net;
-        int anchId;
-        int rate;
-        bool isFilterEnabled;
-        int userCmd;
-        int pdoaOffset;
-        int rngOffset;
-    };
+    // struct PdoaConfiguration {
+    //     int dlist;
+    //     int klist;
+    //     int net;
+    //     int anchId;
+    //     int rate;
+    //     bool isFilterEnabled;
+    //     int userCmd;
+    //     int pdoaOffset;
+    //     int rngOffset;
+    // };
 
-    struct TagParameters {
-        std::string a64;
-        int a16;
-        int F;
-        int S;
-        int M;
-    };
+    // struct TagParameters {
+    //     std::string a64;
+    //     int a16;
+    //     int F;
+    //     int S;
+    //     int M;
+    // };
 
-    explicit BU04Handler(IUart& uart, std::chrono::milliseconds timeout = std::chrono::milliseconds(1000))
+    explicit DeviceHandler(IUart& uart, std::chrono::milliseconds timeout = std::chrono::milliseconds(1000))
         : uart_(uart), timeout_(timeout), timePrevTx_(std::chrono::high_resolution_clock::now()) {}
 
     // void handleData(const char* data);
@@ -72,14 +73,14 @@ public:
     EResult GetAt(std::string& response);
     EResult GetVer(std::string& response, std::string& version);
     EResult GetWorkMode(std::string& response, int& workMode);
-    EResult GetCfg(std::string& response, DeviceConfiguration& deviceConfig);
+    EResult GetCfg(std::string& response, DeviceParameters& deviceConfig);
     EResult GetSensor(std::string& response, SensorData& sensorData);
     EResult GetDistance(std::string& response, float& distance);
-    EResult GetDev(std::string& response, TwrDeviceSetup& setup);
+    EResult GetDev(std::string& response, GetDevParam& setup);
     EResult GetDeca(std::string& response);
     EResult GetDList(std::string& response);
     EResult GetKList(std::string& response);
-    EResult GetPdoaCfg(std::string& response, PdoaConfiguration& pdoaCfg);
+    EResult GetPdoaCfg(std::string& response, PdoaGetCfgParam& pdoaCfg);
     EResult GetUwbMode(std::string& response, int& uwbMode);
 
     EResult AddTag(std::string& response, const TagParameters& tagParams);
@@ -90,8 +91,8 @@ public:
 
 
     EResult SetWorkMode(int workMode);
-    EResult SetCfg(const DeviceConfiguration& deviceConfig);
-    EResult SetDev(const TwrDeviceSetup& setup);
+    EResult SetCfg(const DeviceParameters& deviceConfig);
+    EResult SetDev(const GetDevParam& setup);
     EResult SetPdoaOffset(int offset); // angle offset in deg
     EResult SetRngOffset(int offset); // distance offset in mm
 
