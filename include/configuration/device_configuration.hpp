@@ -17,7 +17,7 @@ struct SensorData {
     float angle;
 };
 
-struct GetDevParam {
+struct TwrParameters {
     int tagCapacity;
     int antennaDelay;
     bool isKalmanFilterEnabled;
@@ -29,7 +29,7 @@ struct GetDevParam {
     int positioningDimension;
 };
 
-struct PdoaGetCfgParam {
+struct PdoaParameters {
     int dlist;
     int klist;
     int net;
@@ -54,9 +54,9 @@ struct DeviceConfiguration {
     static constexpr int kCurrentVersion = 1;
 
     int version{kCurrentVersion};
-    DeviceParameters getCfg;
-    GetDevParam twrSetup;
-    PdoaGetCfgParam pdoaConfig;
+    DeviceParameters deviceParam;
+    TwrParameters twrParam;
+    PdoaParameters pdoaParam;
 };
 
 #endif // DEVICE_CONFIG_HPP_

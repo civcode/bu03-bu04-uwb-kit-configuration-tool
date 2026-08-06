@@ -243,7 +243,7 @@ EResult DeviceHandler::GetDistance(std::string &response, float &distance)
     return EResult::kSuccess;
 }
 
-EResult DeviceHandler::GetDev(std::string &response, GetDevParam& setup)
+EResult DeviceHandler::GetDev(std::string &response, TwrParameters& setup)
 {
     std::cout << "GetDev() called" << std::endl;
 
@@ -365,7 +365,7 @@ EResult DeviceHandler::GetKList(std::string &response)
     return EResult::kSuccess;
 }
 
-EResult DeviceHandler::GetPdoaCfg(std::string &response, PdoaGetCfgParam &pdoaCfg)
+EResult DeviceHandler::GetPdoaCfg(std::string &response, PdoaParameters &pdoaCfg)
 {
     std::cout << "GetPdoaCfg() called" << std::endl;
 
@@ -691,7 +691,7 @@ EResult DeviceHandler::SetWorkMode(int workMode)
     return EResult::kSuccess;
 }
 
-EResult DeviceHandler::SetDev(const GetDevParam &setup)
+EResult DeviceHandler::SetDev(const TwrParameters &setup)
 {
     std::cout << "SetDev() called" << std::endl;
 

@@ -193,7 +193,7 @@ int main(int argc, char* argv[])
 
         
         std::string devInfo;
-        GetDevParam getDev;
+        TwrParameters getDev;
         // while (!stop_requested.test()) {
         result = handler.GetDev(devInfo, getDev);
         if (result == DeviceHandler::EResult::kSuccess) {
@@ -287,7 +287,7 @@ int main(int argc, char* argv[])
         }
         std::cout << std::endl; 
 
-        PdoaGetCfgParam pdoaCfg;
+        PdoaParameters pdoaCfg;
         result = handler.GetPdoaCfg(response, pdoaCfg);
         if (result == DeviceHandler::EResult::kSuccess) {
             std::cout << "BU04 PDoA Configuration: " << response << std::endl;
@@ -306,9 +306,9 @@ int main(int argc, char* argv[])
         std::cout << std::endl;
 
         DeviceConfiguration deviceConfig{
-            .getCfg = getCfg,
-            .twrSetup = getDev,
-            .pdoaConfig = pdoaCfg
+            .deviceParam = getCfg,
+            .twrParam = getDev,
+            .pdoaParam = pdoaCfg
         };
 
         ConfigurationFile::Save("device_config.json", deviceConfig);

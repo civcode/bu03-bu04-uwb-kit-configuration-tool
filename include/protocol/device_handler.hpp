@@ -30,7 +30,7 @@ public:
     //     float angle;
     // };
 
-    // struct TwrDeviceSetup {
+    // struct TwrConfiguration {
     //     int tagCapacity;
     //     int antennaDelay;
     //     bool isKalmanFilterEnabled;
@@ -76,11 +76,11 @@ public:
     EResult GetCfg(std::string& response, DeviceParameters& deviceConfig);
     EResult GetSensor(std::string& response, SensorData& sensorData);
     EResult GetDistance(std::string& response, float& distance);
-    EResult GetDev(std::string& response, GetDevParam& setup);
+    EResult GetDev(std::string& response, TwrParameters& setup);
     EResult GetDeca(std::string& response);
     EResult GetDList(std::string& response);
     EResult GetKList(std::string& response);
-    EResult GetPdoaCfg(std::string& response, PdoaGetCfgParam& pdoaCfg);
+    EResult GetPdoaCfg(std::string& response, PdoaParameters& pdoaCfg);
     EResult GetUwbMode(std::string& response, int& uwbMode);
 
     EResult AddTag(std::string& response, const TagParameters& tagParams);
@@ -92,7 +92,7 @@ public:
 
     EResult SetWorkMode(int workMode);
     EResult SetCfg(const DeviceParameters& deviceConfig);
-    EResult SetDev(const GetDevParam& setup);
+    EResult SetDev(const TwrParameters& setup);
     EResult SetPdoaOffset(int offset); // angle offset in deg
     EResult SetRngOffset(int offset); // distance offset in mm
 

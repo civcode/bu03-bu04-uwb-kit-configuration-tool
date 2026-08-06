@@ -39,7 +39,7 @@ inline void from_json(const json& j, SensorData& s) {
     j.at("angle").get_to(s.angle);
 }
 
-inline void to_json(json& j, const GetDevParam& t) {
+inline void to_json(json& j, const TwrParameters& t) {
     j = json{
         {"tagCapacity", t.tagCapacity},
         {"antennaDelay", t.antennaDelay},
@@ -53,7 +53,7 @@ inline void to_json(json& j, const GetDevParam& t) {
     };
 }
 
-inline void from_json(const json& j, GetDevParam& t) {
+inline void from_json(const json& j, TwrParameters& t) {
     j.at("tagCapacity").get_to(t.tagCapacity);
     j.at("antennaDelay").get_to(t.antennaDelay);
     j.at("isKalmanFilterEnabled").get_to(t.isKalmanFilterEnabled);
@@ -65,7 +65,7 @@ inline void from_json(const json& j, GetDevParam& t) {
     j.at("positioningDimension").get_to(t.positioningDimension);
 }
 
-inline void to_json(json& j, const PdoaGetCfgParam& p) {
+inline void to_json(json& j, const PdoaParameters& p) {
     j = json{
         {"dlist", p.dlist},
         {"klist", p.klist},
@@ -79,7 +79,7 @@ inline void to_json(json& j, const PdoaGetCfgParam& p) {
     };
 }
 
-inline void from_json(const json& j, PdoaGetCfgParam& p) {
+inline void from_json(const json& j, PdoaParameters& p) {
     j.at("dlist").get_to(p.dlist);
     j.at("klist").get_to(p.klist);
     j.at("net").get_to(p.net);
@@ -112,17 +112,17 @@ inline void from_json(const json& j, TagParameters& t) {
 inline void to_json(json& j, const DeviceConfiguration& d) {
     j = json{
         {"version", d.version},
-        {"getCfg", d.getCfg},
-        {"twrSetup", d.twrSetup},
-        {"pdoaConfig", d.pdoaConfig}
+        {"deviceParam", d.deviceParam},
+        {"twrParam", d.twrParam},
+        {"pdoaParam", d.pdoaParam}
     };
 }
 
 inline void from_json(const json& j, DeviceConfiguration& d) {
     j.at("version").get_to(d.version);
-    j.at("getCfg").get_to(d.getCfg);
-    j.at("twrSetup").get_to(d.twrSetup);
-    j.at("pdoaConfig").get_to(d.pdoaConfig);
+    j.at("deviceParam").get_to(d.deviceParam);
+    j.at("twrParam").get_to(d.twrParam);
+    j.at("pdoaParam").get_to(d.pdoaParam);
 }
 
 #endif // SERIALIZATION_HPP_
