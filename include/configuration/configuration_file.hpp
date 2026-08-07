@@ -3,7 +3,8 @@
 
 #include <filesystem>
 
-#include "configuration/device_configuration.hpp"
+
+#include "protocol/device_configuration.hpp"
 
 class ConfigurationFile {
 public:

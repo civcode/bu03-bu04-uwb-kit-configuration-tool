@@ -7,7 +7,7 @@
 
 #include "nlohmann/json.hpp"
 
-#include "configuration/device_configuration.hpp"
+#include "protocol/device_configuration.hpp"
 
 using json = nlohmann::ordered_json;
 

@@ -11,7 +11,7 @@
 
 #include "transport/uart.hpp"
 #include "protocol/device_handler.hpp"
-#include "configuration/device_configuration.hpp"
+#include "protocol/device_configuration.hpp"
 #include "configuration/configuration_file.hpp"
 #include "configuration/serialization.hpp"
 

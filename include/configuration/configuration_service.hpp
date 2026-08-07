@@ -3,7 +3,7 @@
 
 
 // #include "transport/iuart.hpp"
-#include "configuration/device_configuration.hpp"
+#include "protocol/device_configuration.hpp"
 #include "protocol/device_handler.hpp"
 
 class ConfigurationService {

@@ -36,3 +36,6 @@ target_link_libraries(uart PRIVATE nlohmann_json::nlohmann_json cxxopts::cxxopts
 
 add_executable(cli ${CMAKE_SOURCE_DIR}/src/cli.cpp ${SOURCES})
 target_link_libraries(cli PRIVATE nlohmann_json::nlohmann_json cxxopts::cxxopts)
+
+add_executable(test ${CMAKE_SOURCE_DIR}/src/test.cpp ${SOURCES})
+target_link_libraries(test PRIVATE cxxopts::cxxopts)
