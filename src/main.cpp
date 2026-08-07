@@ -29,73 +29,6 @@ namespace
 
 }
 
-void test_command(Uart& uart, const std::string& command)
-{
-    uart.writeText(command + "\r\n");
-
-    // const std::string received = uart.readSome();
-    std::uint8_t buffer[256];
-    const std::size_t bytesRead = uart.read(buffer, 256, std::chrono::milliseconds(500));
-    const std::string received(
-        reinterpret_cast<const char*>(buffer),
-        bytesRead);
-
-    if (!received.empty()) {
-        std::cout << "Received " << received.size()
-                  << " bytes: " << std::endl << std::flush;
-        std::cout << received << std::flush;
-    } else {
-        std::cout << "Read timeout\n";
-    }
-    for (unsigned char ch : received) {
-        std::cout << std::hex
-                << std::setw(2)
-                << std::setfill('0')
-                << static_cast<int>(ch)
-                << ' ';
-    }
-
-    std::cout << std::dec << "\n\n";
-}
-
-void test_command2(Uart& uart, const std::string& command)
-{
-    std::cout << "Sending command: " << command << std::endl;
-    uart.writeText(command + "\r\n");
-
-    std::string received;
-    uart.readText(received, 256);
-
-    // PrintAllChar(received);
-    std::cout << received << std::flush;
-    std::cout << std::endl;
-
-
-    // const std::string received = uart.readSome();
-//     std::uint8_t buffer[256];
-//     const std::size_t bytesRead = uart.read(buffer, 256, std::chrono::milliseconds(500));
-//     const std::string received(
-//         reinterpret_cast<const char*>(buffer),
-//         bytesRead);
-
-//     if (!received.empty()) {
-//         std::cout << "Received " << received.size()
-//                   << " bytes: " << std::endl << std::flush;
-//         std::cout << received << std::flush;
-//     } else {
-//         std::cout << "Read timeout\n";
-//     }
-//     for (unsigned char ch : received) {
-//         std::cout << std::hex
-//                 << std::setw(2)
-//                 << std::setfill('0')
-//                 << static_cast<int>(ch)
-//                 << ' ';
-//     }
-
-//     std::cout << std::dec << "\n\n";
-}
-
 int main(int argc, char* argv[])
 {
     const std::string device =
@@ -106,36 +39,50 @@ int main(int argc, char* argv[])
     try {
         auto uart = Uart(device, B115200);
 
-        std::cout << "Opened " << device << " at 115200 baud\n";
-
-        // std::cout << "Sending test commands...\n";
-        // test_command(uart, "AT");
-        // test_command(uart, "AT+GETVER");
-        // test_command(uart, "AT+GETWORKMODE");
-        // test_command(uart, "AT+GETCFG");
-        // test_command(uart, "AT+GETSENSOR");
-        // test_command(uart, "AT+TESTLED");
-        // // test_command(*uart, "AT+TESTOLED");
-        // test_command(uart, "AT+DISTANCE");
-        // test_command(uart, "AT+GETDEV");
-
-        // std::cout << "Sending test commands (readText)...\n";
-        // test_command2(uart, "AT+GETVER");
-        // test_command2(uart, "AT+GETCFG");
-        // test_command2(uart, "AT+GETDEV");
-
         DeviceHandler handler(uart);
 
         DeviceHandler::EResult result;
         std::string response;
 
-        // result = handler.GetAt(response);
-        // if (result == BU04Handler::EResult::kSuccess) {
-        //     std::cout << "BU04 AT Response: " << response << std::endl;
-        // } else {
-        //     std::cerr << "Failed to get BU04 AT response\n";
-        // }
-        // std::cout << std::endl;
+        DeviceConfiguration deviceConfig;
+        result = handler.GetDeviceConfiguration(deviceConfig);
+        if (result == DeviceHandler::EResult::kSuccess) {
+            std::cout << "BU04 Device Configuration retrieved successfully." << std::endl;
+            std::cout << "Device ID: " << deviceConfig.deviceParam.id << std::endl;
+            std::cout << "Device Role: " << deviceConfig.deviceParam.role << std::endl;
+            std::cout << "Device Channel: " << deviceConfig.deviceParam.channel << std::endl;
+            std::cout << "Device Rate: " << deviceConfig.deviceParam.rate << std::endl;
+            std::cout << "TWR Tag Capacity: " << deviceConfig.twrParam.tagCapacity << std::endl;
+            std::cout << "TWR Antenna Delay: " << deviceConfig.twrParam.antennaDelay << std::endl;
+            std::cout << "TWR Kalman Filter Enabled: " << std::boolalpha << deviceConfig.twrParam.isKalmanFilterEnabled << std::endl;
+            std::cout << "TWR Kalman Q: " << deviceConfig.twrParam.kalmanQ << std::endl;
+            std::cout << "TWR Kalman R: " << deviceConfig.twrParam.kalmanR << std::endl;
+            std::cout << "TWR Correction Parameter A: " << deviceConfig.twrParam.correctionParameterA << std::endl;
+            std::cout << "TWR Correction Parameter B: " << deviceConfig.twrParam.correctionParameterB << std::endl;
+            std::cout << "TWR Positioning Enabled: " << std::boolalpha << deviceConfig.twrParam.isPositioningEnabled << std::endl;
+            std::cout << "TWR Positioning Dimension: " << deviceConfig.twrParam.positioningDimension << std::endl;
+            std::cout << "PDoA DList: " << deviceConfig.pdoaParam.dlist << std::endl;
+            std::cout << "PDoA KList: "<< deviceConfig.pdoaParam.klist << std::endl;
+            std::cout << "PDoA Net: " << deviceConfig.pdoaParam.net << std::endl;
+            std::cout << "PDoA AncID: " << deviceConfig.pdoaParam.anchId << std::endl;
+            std::cout << "PDoA Rate: " << deviceConfig.pdoaParam.rate << std::endl;
+            std::cout << "PDoA Filter Enabled: " << std::boolalpha << deviceConfig.pdoaParam.isFilterEnabled << std::endl;
+            std::cout << "PDoA UserCmd: " << deviceConfig.pdoaParam.userCmd << std::endl;
+            std::cout << "PDoA PDoA Offset: " << deviceConfig.pdoaParam.pdoaOffset << std::endl;
+            std::cout << "PDoA Range Offset: " << deviceConfig.pdoaParam.rngOffset << std::endl;
+            std::cout << "Work Mode: " << deviceConfig.workMode.mode << std::endl;
+            std::cout << "UWB Mode: " << deviceConfig.uwbMode.mode << std::endl;
+            std::cout << "PDoA Misc Version: " << deviceConfig.pdoaMisc.version << std::endl;
+            std::cout << "PDoA Misc DList: " << deviceConfig.pdoaMisc.dlist << std::endl;
+            std::cout << "PDoA Misc KList: " << deviceConfig.pdoaMisc.klist << std::endl;
+        } else {
+            std::cerr << "Failed to retrieve BU04 Device Configuration." << std::endl;
+        }
+        std::cout << std::endl; 
+
+        ConfigurationFile::Save("device_config.json", deviceConfig);
+        
+        return 0;
 
     
 
@@ -319,7 +266,7 @@ int main(int argc, char* argv[])
             .klist = klist
         };
 
-        DeviceConfiguration deviceConfig{
+        DeviceConfiguration deviceConfig2{
             .deviceParam = getCfg,
             .twrParam = getDev,
             .pdoaParam = pdoaCfg,
@@ -328,7 +275,7 @@ int main(int argc, char* argv[])
             .pdoaMisc = pdoaMisc
         };
 
-        ConfigurationFile::Save("device_config.json", deviceConfig);
+        ConfigurationFile::Save("device_config.json", deviceConfig2);
         // ConfigurationFile::Save("device_config.json", deviceParam);
 
         DeviceConfigurationPatch deviceConfigPatch = ConfigurationFile::LoadPatch("device_config_patch.json");

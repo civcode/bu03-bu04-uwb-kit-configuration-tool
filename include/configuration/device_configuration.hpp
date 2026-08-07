@@ -30,10 +30,10 @@ struct TwrParameters {
     int tagCapacity;
     int antennaDelay;
     bool isKalmanFilterEnabled;
-    float kalmanQ;
-    float kalmanR;
-    float correctionParameterA;
-    float correctionParameterB;
+    double kalmanQ;
+    double kalmanR;
+    double correctionParameterA;
+    double correctionParameterB;
     bool isPositioningEnabled;
     int positioningDimension;
 };

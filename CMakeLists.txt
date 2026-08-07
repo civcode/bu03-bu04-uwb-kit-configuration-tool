@@ -15,7 +15,14 @@ FetchContent_Declare(
   json
   URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz
 )
+FetchContent_Declare(
+  cxxopts
+  GIT_REPOSITORY https://github.com/jarro2783/cxxopts.git
+  GIT_TAG v3.3.1
+)
+
 FetchContent_MakeAvailable(json)
+FetchContent_MakeAvailable(cxxopts)
 
 set(SOURCES
     ${CMAKE_SOURCE_DIR}/src/device_handler.cpp
@@ -25,5 +32,7 @@ set(SOURCES
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
 add_executable(uart ${CMAKE_SOURCE_DIR}/src/main.cpp ${SOURCES})
-target_link_libraries(uart PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(uart PRIVATE nlohmann_json::nlohmann_json cxxopts::cxxopts)
 
+add_executable(cli ${CMAKE_SOURCE_DIR}/src/cli.cpp ${SOURCES})
+target_link_libraries(cli PRIVATE nlohmann_json::nlohmann_json cxxopts::cxxopts)

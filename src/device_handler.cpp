@@ -275,22 +275,22 @@ EResult DeviceHandler::GetDev(std::string &response, TwrParameters& setup)
             return EResult::kUnexpectedResponse;
         }
         if (ExtractDataString(received, "kalman_Q:", ",", data) == EResult::kSuccess) {
-            setup.kalmanQ = std::stof(data);
+            setup.kalmanQ = std::stod(data);
         } else {
             return EResult::kUnexpectedResponse;
         }
         if (ExtractDataString(received, "kalman_R:", ",", data) == EResult::kSuccess) {
-            setup.kalmanR = std::stof(data);
+            setup.kalmanR = std::stod(data);
         } else {
             return EResult::kUnexpectedResponse;
         }
         if (ExtractDataString(received, "para_a:", ",", data) == EResult::kSuccess) {
-            setup.correctionParameterA = std::stof(data);
+            setup.correctionParameterA = std::stod(data);
         } else {
             return EResult::kUnexpectedResponse;
         }
         if (ExtractDataString(received, "para_b:", ",", data) == EResult::kSuccess) {
-            setup.correctionParameterB = std::stof(data);
+            setup.correctionParameterB = std::stod(data);
         } else {
             return EResult::kUnexpectedResponse;
         }
@@ -458,6 +458,153 @@ EResult DeviceHandler::GetUwbMode(std::string &response, int &uwbMode)
     return EResult::kSuccess;
 }
 
+EResult DeviceHandler::GetDeviceConfiguration(DeviceConfiguration &deviceConfig)
+{
+    std::cout << "GetDeviceConfiguration() called" << std::endl;
+
+    EResult result;
+    std::string response;
+    
+    std::string versionString;
+    result = GetVer(response, versionString);
+    if (result == DeviceHandler::EResult::kSuccess) {
+        // std::cout << "BU04 Version: " << versionString << std::endl;
+    } else {
+        std::cerr << "Failed to get BU04 version\n";
+        return result;
+    }
+    std::cout << std::endl;
+    // std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    int workMode;
+    result = GetWorkMode(response, workMode);
+    if (result == DeviceHandler::EResult::kSuccess) {
+        // std::cout << "BU04 Work Mode: " << workMode << std::endl;
+    } else {
+        std::cerr << "Failed to get BU04 work mode\n";
+        return result;
+    }
+    std::cout << std::endl;
+
+    // std::string deviceParamString;
+    DeviceParameters deviceParam;
+    // while (!stop_requested.test()) {
+    result = GetCfg(response, deviceParam);
+    if (result == DeviceHandler::EResult::kSuccess) {
+        // std::cout << "BU04 Device Configuration: " << response << std::endl;
+        // std::cout << "ID: " << deviceParam.id << std::endl;
+        // std::cout << "Role: " << deviceParam.role << std::endl;
+        // std::cout << "Channel: " << deviceParam.channel << std::endl;
+        // std::cout << "Rate: " << deviceParam.rate << std::endl;
+    } else {
+        std::cerr << "Failed to get BU04 device configuration\n";
+        return result;
+    }
+    std::cout << std::endl;
+    
+    // std::string deviceInfoString;
+    TwrParameters twrParam;
+    // while (!stop_requested.test()) {
+    result = GetDev(response, twrParam);
+    if (result == DeviceHandler::EResult::kSuccess) {
+        // std::cout << "BU04 Device Info: " << response << std::endl;
+        // std::cout << "Tag Capacity: " << twrParam.tagCapacity << std::endl;
+        // std::cout << "Antenna Delay: " << twrParam.antennaDelay << std::endl;
+        // std::cout << "Kalman Filter Enabled: " << std::boolalpha << twrParam.isKalmanFilterEnabled << std::endl;
+        // std::cout << "Kalman Q: " << twrParam.kalmanQ << std::endl;
+        // std::cout << "Kalman R: " << twrParam.kalmanR << std::endl;
+        // std::cout << "Correction Parameter A: " << twrParam.correctionParameterA << std::endl;
+        // std::cout << "Correction Parameter B: " << twrParam.correctionParameterB << std::endl;
+        // std::cout << "Positioning Enabled: " << std::boolalpha << twrParam.isPositioningEnabled << std::endl;
+        // std::cout << "Positioning Dimension: " << twrParam.positioningDimension << std::endl;
+    } else {
+        std::cerr << "Failed to get BU04 device info\n";
+        return result;
+    }
+    std::cout << std::endl;
+
+    std::string pdoaVersionString;
+    result = GetDeca(response);
+    if (result == DeviceHandler::EResult::kSuccess) {
+        // std::cout << "BU04 Deca Response: " << response << std::endl;
+        PrintAllChar(response);
+        pdoaVersionString = response;
+    } else {
+        std::cerr << "Failed to get BU04 deca response\n";
+        return result;
+    }
+    std::cout << std::endl;
+
+    std::string dlistString;
+    result = GetDList(response);
+    if (result == DeviceHandler::EResult::kSuccess) {
+        PrintAllChar(response);
+        dlistString = response;
+    } else {
+        std::cerr << "Failed to get BU04 dlist response\n";
+        return result;
+    }
+    std::cout << std::endl;
+
+    std::string klistString;
+    result = GetKList(response);
+    if (result == DeviceHandler::EResult::kSuccess) {
+        // std::cout << "BU04 KList Response: " << response << std::endl;
+        PrintAllChar(response);
+        klistString = response;
+    } else {
+        std::cerr << "Failed to get BU04 klist response\n";
+        return result;
+    }
+    std::cout << std::endl;
+
+    int uwbMode;
+    result = GetUwbMode(response, uwbMode);
+    if (result == DeviceHandler::EResult::kSuccess) {
+        // std::cout << "BU04 UWB Mode: " << uwbMode << std::endl;
+    } else {
+        std::cerr << "Failed to get BU04 UWB mode\n";
+        return result;
+    }
+    std::cout << std::endl;
+
+    PdoaParameters pdoaCfg;
+    result = GetPdoaCfg(response, pdoaCfg);
+    if (result == DeviceHandler::EResult::kSuccess) {
+        // std::cout << "BU04 PDoA Configuration: " << response << std::endl;
+        // std::cout << "Dlist: " << pdoaCfg.dlist << std::endl;
+        // std::cout << "KList: " << pdoaCfg.klist << std::endl;
+        // std::cout << "Net: " << pdoaCfg.net << std::endl;
+        // std::cout << "AncID: " << pdoaCfg.anchId << std::endl;
+        // std::cout << "Rate: " << pdoaCfg.rate << std::endl;
+        // std::cout << "Filter Enabled: " << std::boolalpha << pdoaCfg.isFilterEnabled << std::endl;
+        // std::cout << "UserCmd: " << pdoaCfg.userCmd << std::endl;
+        // std::cout << "PDoA Offset: " << pdoaCfg.pdoaOffset << std::endl;
+        // std::cout << "Range Offset: " << pdoaCfg.rngOffset << std::endl;
+    } else {
+        std::cerr << "Failed to get BU04 PDoA configuration\n";
+    }
+    std::cout << std::endl;
+
+    PdoaMisc pdoaMisc{
+        .version = pdoaVersionString,
+        .dlist = dlistString,
+        .klist = klistString
+    };
+
+    WorkMode workModeStruct{.mode = workMode};
+    UwbMode uwbModeStruct{.mode = uwbMode};
+    
+    deviceConfig.deviceParam = deviceParam;
+    deviceConfig.twrParam = twrParam;
+    deviceConfig.pdoaParam = pdoaCfg;
+    deviceConfig.workMode = workModeStruct;
+    deviceConfig.uwbMode = uwbModeStruct;
+    deviceConfig.pdoaMisc = pdoaMisc;   
+
+    return EResult::kSuccess;
+}
+
 EResult DeviceHandler::ExtractErrorCode(const std::string& response)
 {
     if (response.find("OK") != std::string::npos) {
@@ -471,7 +618,7 @@ EResult DeviceHandler::ExtractErrorCode(const std::string& response)
 
 EResult DeviceHandler::ParseResponse(std::string& response)
 {
-    std::cout << "ParseResponse() called" << std::endl;
+    // std::cout << "ParseResponse() called" << std::endl;
     // PrintAllChar(response);
 
     EResult result;
@@ -512,7 +659,7 @@ EResult DeviceHandler::ParseResponse(std::string& response)
 
 EResult DeviceHandler::HandleComm(const std::string &command, std::string &response, bool returnRawResponse)
 {
-    std::cout << "HandleComm() called" << std::endl;
+    // std::cout << "HandleComm() called" << std::endl;
 
     // Purge uart buffers
     // uart_.writeText("AT\r\n");
@@ -530,7 +677,7 @@ EResult DeviceHandler::HandleComm(const std::string &command, std::string &respo
     timePrevTx_ = std::chrono::high_resolution_clock::now();
 
 
-    PrintAllChar(command);
+    // PrintAllChar(command);
     uart_.writeText(command);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 

@@ -12,55 +12,8 @@ public:
         kSuccess,
         kTimeout,
         kUnexpectedResponse,
-        // kUartError,
         kError
     };
-
-    // struct DeviceParameters {
-    //     int id;
-    //     int role;
-    //     int channel;
-    //     int rate;
-    // };
-
-    // struct SensorData {
-    //     float accX;
-    //     float accY;
-    //     float accZ;
-    //     float angle;
-    // };
-
-    // struct TwrConfiguration {
-    //     int tagCapacity;
-    //     int antennaDelay;
-    //     bool isKalmanFilterEnabled;
-    //     float kalmanQ;
-    //     float kalmanR;
-    //     float correctionParameterA;
-    //     float correctionParameterB;
-    //     bool isPositioningEnabled;
-    //     int positioningDimension;
-    // };
-
-    // struct PdoaConfiguration {
-    //     int dlist;
-    //     int klist;
-    //     int net;
-    //     int anchId;
-    //     int rate;
-    //     bool isFilterEnabled;
-    //     int userCmd;
-    //     int pdoaOffset;
-    //     int rngOffset;
-    // };
-
-    // struct TagParameters {
-    //     std::string a64;
-    //     int a16;
-    //     int F;
-    //     int S;
-    //     int M;
-    // };
 
     explicit DeviceHandler(IUart& uart, std::chrono::milliseconds timeout = std::chrono::milliseconds(1000))
         : uart_(uart), timeout_(timeout), timePrevTx_(std::chrono::high_resolution_clock::now()) {}
@@ -82,6 +35,7 @@ public:
     EResult GetKList(std::string& response);
     EResult GetPdoaCfg(std::string& response, PdoaParameters& pdoaCfg);
     EResult GetUwbMode(std::string& response, int& uwbMode);
+    EResult GetDeviceConfiguration(DeviceConfiguration& deviceConfig);
 
     EResult AddTag(std::string& response, const TagParameters& tagParams);
     EResult DelTag(std::string& response, const std::string& a64);
@@ -103,7 +57,7 @@ public:
 
 private:
     constexpr static std::size_t kMaxResponseSize = 1024;
-    constexpr static std::chrono::milliseconds kUartWaitTime = std::chrono::milliseconds(100);
+    constexpr static std::chrono::milliseconds kUartWaitTime = std::chrono::milliseconds(50);
 
     std::chrono::high_resolution_clock::time_point timePrevTx_;
 

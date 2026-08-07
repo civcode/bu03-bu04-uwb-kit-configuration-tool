@@ -1,6 +1,10 @@
 #ifndef SERIALIZATION_HPP_
 #define SERIALIZATION_HPP_
 
+#include <ctime>
+#include <chrono>
+#include <string>
+
 #include "nlohmann/json.hpp"
 
 #include "configuration/device_configuration.hpp"
@@ -153,8 +157,17 @@ inline void from_json(const json& j, PdoaMisc& p) {
 }
 
 inline void to_json(json& j, const DeviceConfiguration& d) {
+    auto now = std::chrono::system_clock::now();
+    std::time_t time = std::chrono::system_clock::to_time_t(now);
+    std::tm* local = std::localtime(&time);
+    char buffer[32];
+    std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", local);
+
+    std::string timestamp(buffer);
+
     j = json{
         {"version", d.version},
+        {"timestamp", timestamp},
         {"deviceParam", d.deviceParam},
         {"twrParam", d.twrParam},
         {"pdoaParam", d.pdoaParam},
