@@ -5,10 +5,36 @@
 
 #include "configuration/device_configuration.hpp"
 
-using json = nlohmann::json;
+using json = nlohmann::ordered_json;
+
+inline void to_json(json& j, const WorkMode &workMode) {
+    j = json{
+        {"command", "AT+GETWORKMODE"},
+        // {"description", "0=Normal mode, 1=Test mode"},
+        {"workMode", workMode.mode}
+    };
+}
+
+inline void from_json(const json& j, WorkMode &workMode) {
+    j.at("workMode").get_to(workMode.mode);
+}
+
+inline void to_json(json& j, const UwbMode &uwbMode) {
+    j = json{
+        {"command", "AT+GETUWBMODE"},
+        // {"description", "0=TWR, 1=PDOA"},
+        {"uwbMode", uwbMode.mode}
+    };
+}
+
+inline void from_json(const json& j, UwbMode &uwbMode) {
+    j.at("uwbMode").get_to(uwbMode.mode);
+}
 
 inline void to_json(json& j, const DeviceParameters& p) {
+    // static constexpr const char* command = "AT+GETCFG";
     j = json{
+        {"command", "AT+GETCFG"},
         {"id", p.id},
         {"role", p.role},
         {"channel", p.channel},
@@ -25,6 +51,7 @@ inline void from_json(const json& j, DeviceParameters& p) {
 
 inline void to_json(json& j, const SensorData& s) {
     j = json{
+        {"command", "AT+GETSENSOR"},
         {"accX", s.accX},
         {"accY", s.accY},
         {"accZ", s.accZ},
@@ -41,6 +68,7 @@ inline void from_json(const json& j, SensorData& s) {
 
 inline void to_json(json& j, const TwrParameters& t) {
     j = json{
+        {"command", "AT+GETDEV"},
         {"tagCapacity", t.tagCapacity},
         {"antennaDelay", t.antennaDelay},
         {"isKalmanFilterEnabled", t.isKalmanFilterEnabled},
@@ -67,6 +95,7 @@ inline void from_json(const json& j, TwrParameters& t) {
 
 inline void to_json(json& j, const PdoaParameters& p) {
     j = json{
+        {"command", "AT+PDOAGETCFG"},
         {"dlist", p.dlist},
         {"klist", p.klist},
         {"net", p.net},
@@ -109,12 +138,29 @@ inline void from_json(const json& j, TagParameters& t) {
     j.at("M").get_to(t.M);
 }
 
+inline void to_json(json& j, const PdoaMisc& p) {
+    j = json{
+        {"version", p.version},
+        {"dlist", p.dlist},
+        {"klist", p.klist}
+    };
+}
+
+inline void from_json(const json& j, PdoaMisc& p) {
+    j.at("version").get_to(p.version);
+    j.at("dlist").get_to(p.dlist);
+    j.at("klist").get_to(p.klist);
+}
+
 inline void to_json(json& j, const DeviceConfiguration& d) {
     j = json{
         {"version", d.version},
         {"deviceParam", d.deviceParam},
         {"twrParam", d.twrParam},
-        {"pdoaParam", d.pdoaParam}
+        {"pdoaParam", d.pdoaParam},
+        {"workMode", d.workMode},
+        {"uwbMode", d.uwbMode},
+        {"pdoaMisc", d.pdoaMisc}
     };
 }
 
@@ -123,6 +169,40 @@ inline void from_json(const json& j, DeviceConfiguration& d) {
     j.at("deviceParam").get_to(d.deviceParam);
     j.at("twrParam").get_to(d.twrParam);
     j.at("pdoaParam").get_to(d.pdoaParam);
+    j.at("workMode").get_to(d.workMode);
+    j.at("uwbMode").get_to(d.uwbMode);
+    j.at("pdoaMisc").get_to(d.pdoaMisc);
+}
+
+inline void to_json(json& j, const DeviceConfigurationPatch& d) {
+    j = json::object();
+
+    if (d.deviceParam.has_value()) {
+        j["deviceParam"] = d.deviceParam.value();
+    }
+    if (d.twrParam.has_value()) {
+        j["twrParam"] = d.twrParam.value();
+    }
+    // if (d.pdoaParam.has_value()) {
+    //     j["pdoaParam"] = d.pdoaParam.value();
+    // }
+}
+
+inline void from_json(const json& j, DeviceConfigurationPatch& d) {
+    if (j.contains("deviceParam") && !j.at("deviceParam").is_null()) {
+        d.deviceParam = j.at("deviceParam").get<DeviceParameters>();
+    } else {
+        d.deviceParam.reset();    
+    }
+
+    if (j.contains("twrParam") && !j.at("twrParam").is_null()) {
+        d.twrParam = j.at("twrParam").get<TwrParameters>();
+    } else {
+        d.twrParam.reset();
+    }
+    // if (j.contains("pdoaParam")) {
+    //     d.pdoaParam = j.at("pdoaParam").get<PdoaParameters>();
+    // }
 }
 
 #endif // SERIALIZATION_HPP_

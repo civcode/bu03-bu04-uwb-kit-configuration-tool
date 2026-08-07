@@ -8,6 +8,7 @@
 class ConfigurationFile {
 public:
     static DeviceConfiguration Load(const std::filesystem::path& filePath);
+    static DeviceConfigurationPatch LoadPatch(const std::filesystem::path& filePath);
     static void Save(const std::filesystem::path& filePath, const DeviceConfiguration& config);
 };
 

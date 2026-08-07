@@ -8,7 +8,7 @@
 #include "configuration/configuration_file.hpp"
 #include "configuration/serialization.hpp"
 
-using json = nlohmann::json;
+using json = nlohmann::ordered_json;
 
 DeviceConfiguration ConfigurationFile::Load(const std::filesystem::path& filePath)
 {
@@ -32,6 +32,22 @@ DeviceConfiguration ConfigurationFile::Load(const std::filesystem::path& filePat
     }
 }
 
+DeviceConfigurationPatch ConfigurationFile::LoadPatch(const std::filesystem::path& filePath)
+{
+    std::ifstream file(filePath, std::ios::binary);
+    if (!file) {
+        throw std::runtime_error("Failed to open configuration patch file: " + filePath.string());
+    }   
+
+    try {
+        json document;
+        file >> document;
+        return document.get<DeviceConfigurationPatch>();
+    } catch (const json::exception& e) {
+        throw std::runtime_error("Failed to parse JSON configuration patch: " + std::string(e.what()));
+    }
+}
+
 void ConfigurationFile::Save(const std::filesystem::path& filePath, const DeviceConfiguration& config)
 {
     std::ofstream file(filePath, std::ios::binary);
@@ -39,6 +55,8 @@ void ConfigurationFile::Save(const std::filesystem::path& filePath, const Device
         throw std::runtime_error("Failed to open configuration file for writing: " + filePath.string());
     }
 
+
+    // const nlohmann::ordered_json document = config;
     const json document = config;
     file << document.dump(4); // Pretty print with 4 spaces indentation
     if (!file) {

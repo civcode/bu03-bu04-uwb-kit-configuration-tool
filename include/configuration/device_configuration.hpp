@@ -1,7 +1,16 @@
 #ifndef DEVICE_CONFIG_HPP_
 #define DEVICE_CONFIG_HPP_
 
+#include <optional>
 #include <string>
+
+struct WorkMode {
+    int mode;
+};
+
+struct UwbMode {
+    int mode;
+};
 
 struct DeviceParameters {
     int id;
@@ -41,6 +50,12 @@ struct PdoaParameters {
     int rngOffset;
 };
 
+struct PdoaMisc {
+    std::string version;
+    std::string dlist;
+    std::string klist;
+};
+
 struct TagParameters {
     std::string a64;
     int a16;
@@ -57,6 +72,16 @@ struct DeviceConfiguration {
     DeviceParameters deviceParam;
     TwrParameters twrParam;
     PdoaParameters pdoaParam;
+    WorkMode workMode;
+    UwbMode uwbMode;
+    PdoaMisc pdoaMisc;
+};
+
+struct DeviceConfigurationPatch {
+    std::optional<DeviceParameters> deviceParam;
+    std::optional<TwrParameters> twrParam;
+    // std::optional<PdoaParameters> pdoaParam;
+
 };
 
 #endif // DEVICE_CONFIG_HPP_

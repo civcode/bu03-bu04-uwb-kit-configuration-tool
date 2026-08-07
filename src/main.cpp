@@ -224,28 +224,36 @@ int main(int argc, char* argv[])
         }
         std::cout << std::endl;
 
+        std::string pdoaVersion;
         result = handler.GetDeca(response);
         if (result == DeviceHandler::EResult::kSuccess) {
             // std::cout << "BU04 Deca Response: " << response << std::endl;
             handler.PrintAllChar(response);
+            pdoaVersion = response;
         } else {
             std::cerr << "Failed to get BU04 deca response\n";
         }
         std::cout << std::endl;
 
+        // return 0;
+
+        std::string dlist;
         result = handler.GetDList(response);
         if (result == DeviceHandler::EResult::kSuccess) {
             // std::cout << "BU04 DList Response: " << response << std::endl;
             handler.PrintAllChar(response);
+            dlist = response;
         } else {
             std::cerr << "Failed to get BU04 dlist response\n";
         }
         std::cout << std::endl;
 
+        std::string klist;
         result = handler.GetKList(response);
         if (result == DeviceHandler::EResult::kSuccess) {
             // std::cout << "BU04 KList Response: " << response << std::endl;
             handler.PrintAllChar(response);
+            klist = response;
         } else {
             std::cerr << "Failed to get BU04 klist response\n";
         }
@@ -305,14 +313,33 @@ int main(int argc, char* argv[])
         }
         std::cout << std::endl;
 
+        PdoaMisc pdoaMisc{
+            .version = pdoaVersion,
+            .dlist = dlist,
+            .klist = klist
+        };
+
         DeviceConfiguration deviceConfig{
             .deviceParam = getCfg,
             .twrParam = getDev,
-            .pdoaParam = pdoaCfg
+            .pdoaParam = pdoaCfg,
+            .workMode = workMode,
+            .uwbMode = uwbMode,
+            .pdoaMisc = pdoaMisc
         };
 
         ConfigurationFile::Save("device_config.json", deviceConfig);
         // ConfigurationFile::Save("device_config.json", deviceParam);
+
+        DeviceConfigurationPatch deviceConfigPatch = ConfigurationFile::LoadPatch("device_config_patch.json");
+
+        if (deviceConfigPatch.deviceParam.has_value()) {
+            std::cout << "Device Parameters Patch: " << std::endl;
+            std::cout << "ID: " << deviceConfigPatch.deviceParam->id << std::endl;
+            std::cout << "Role: " << deviceConfigPatch.deviceParam->role << std::endl;
+            std::cout << "Channel: " << deviceConfigPatch.deviceParam->channel << std::endl;
+            std::cout << "Rate: " << deviceConfigPatch.deviceParam->rate << std::endl;
+        }
 
 
         // DeviceHandler::TagParameters tagParams{
